@@ -10,11 +10,18 @@
 
 
 
+start_pos_data <- reactive({
+
+  curr_tour_cyclers <- tournament$data[TOURNAMENT_NM == input$join_tournament, TEAM_ID]
+  curr_info <- ADM_CYCLER_INFO[TEAM_ID %in% curr_tour_cyclers]
+  curr_info
+})
+
 
 output$cyclersInput <- renderUI({
 
 
-  lapply(c(eRstartPosData()[, UI_text], "READY"),
+  lapply(c(start_pos_data()[, UI_text], "READY"),
          function(teksti) { tags$h3(drag = teksti,teksti)})
 })
 
@@ -41,27 +48,37 @@ observeEvent(input$save_initial_grid, {
 
   #get previous game exhaust
 
-  tournament_data <- tournament$data[TOURAMENT_NM == input$join_tournament]
-  cyclers <- tournament_data[, CYCLER_ID]
+  con <- connDB(con, "flaimme")
+  cyclers <- start_pos_data()[, CYCLER_ID]
   track_id <- input$select_track
+
+
+  #grid order
+
+  grid_order <- data.table(UI_text = dragulaValue(input$dragula)$cyclersInput)
+
+
+  #get ui_names back to cycler_ids
+  join_ui_to_cycid <- start_pos_data()[grid_order, on = "UI_text"]
+  #get slots
+  #create temp track
+  join_ui_to_cycid[, start_pos := seq_len(.N)]
+
+
+
+
+
+
   new_row_data <- data.table(TOURNAMENT_NM = input$join_tournament,
-                             GAME_ID =  free_game_id(input$join_tournament),
+                             GAME_ID =  free_game_id(input$join_tournament, con),
                              CYCLER_ID = cyclers,
-                             TRACK_ID = tracK_id,
+                             TRACK_ID = track_id,
                              SLOTS_OVER_FINISH = -1,
                              LANE = -1,
-                             EXHAUST_LEFT = -1)
-  con <- connDB(con, "flaimme")
+                             EXHAUST_LEFT = -1,
+                             START_POSITION = join_ui_to_cycid[, start_pos])
+
   dbIns("TOURNAMENT_RESULT", new_row_data, con)
-  # prev_exhaust <- dbSelectAll("TOURNAMENT_RESULT", con)
-  # prev_game_id <- free_game_id(input$join_tournament) - 1
-  # if (prev_game_id > 0) {
-  #   filter_exh <- prev_exhaust[GAME_ID == prev_game_id, .(CYCLER_ID, starting_exhaust = round(EXHAUST_LEFT / 2))]
-  #
-  # }
-
-
-  #pre_deal cards for the betting
 
 
 })

@@ -11,6 +11,7 @@ output$select_tournament <- renderUI({
 })
 
 output$my_name_is <- renderUI({
+  req(input$join_tournament)
 
   name_list <- tournament$data[TOURNAMENT_NM == input$join_tournament & PLAYER_TYPE == "Human", PLAYER_NM]
   selectInput(inputId = "my_name", label = "Who am I?",
@@ -23,5 +24,5 @@ observeEvent(input$save_me, {
   player_reactive$name <- input$my_name
   #find my team id
 
-  player_reactive$team <-   tournament$data[PLAYER_NM == input$my_name, TEAM_ID]
+  player_reactive$team <-   max(tournament$data[PLAYER_NM == input$my_name, TEAM_ID])
 })

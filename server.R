@@ -6,7 +6,7 @@ ADM_OPTIMAL_MOVES <- fix_colnames(luettu)
 #available tournaments
 tournament <- reactiveValues(data = dbSelectAll("TOURNAMENT", con))
 
-move_to <- reavtiveValues(tab = "")
+move_to <- reactiveValues(tab = "")
 
 shinyServer(function(input, output, session) {
 

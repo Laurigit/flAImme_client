@@ -5,5 +5,6 @@ tabItem(tabName = "tab_bet_for_breakaway",
         fluidPage(radioGroupButtons(inputId = "which_cycler_to_bet",
                                     "Choose cycler to participate in betting",
                                     choices = choise_ids),
-                  actionButton(inputId = "confirm_better", label = "Confirm"))
+                  actionButton(inputId = "confirm_better", label = "Confirm")),
+        uiOutput(outputId = "breakaway_options")
 )
