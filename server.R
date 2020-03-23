@@ -8,10 +8,13 @@ tournament <- reactiveValues(data = dbSelectAll("TOURNAMENT", con))
 
 move_to <- reactiveValues(tab = "")
 
+update_breakaway_bet <- reactiveValues(data = 0)
+
 shinyServer(function(input, output, session) {
 
-  player_reactive <- reactiveValues(name = "",
-                                    team = "")
+  player_reactive <- reactiveValues(name = NULL,
+                                    team = NULL,
+                                    tournament = NULL)
 
 
   reactive({
@@ -19,6 +22,14 @@ shinyServer(function(input, output, session) {
     updateTabItems(session, "sidebarmenu", selected = move_to$tab)
 
   })
+
+
+  #try to read status of breakaway bets
+ #breakaway_bets_data <-  my_reactivePoll(session, "BREAKAWAY_BET", paste0('SELECT count(TEAM_ID) from BREAKAWAY_BET'), timeout = 1000, con)
+ breakaway_cards <-  my_reactivePoll(session, "BREAKAWAY_BET_CARDS", paste0('SELECT * from BREAKAWAY_BET_CARDS'), timeout = 1000, con)
+
+
+
 
 
   react_status <- reactiveValues(phase = 0,

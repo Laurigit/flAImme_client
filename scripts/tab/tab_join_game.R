@@ -23,6 +23,6 @@ output$my_name_is <- renderUI({
 observeEvent(input$save_me, {
   player_reactive$name <- input$my_name
   #find my team id
-
+  player_reactive$tournament <- input$join_tournament
   player_reactive$team <-   max(tournament$data[PLAYER_NM == input$my_name, TEAM_ID])
 })
