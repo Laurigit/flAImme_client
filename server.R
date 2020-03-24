@@ -5,10 +5,13 @@ ADM_OPTIMAL_MOVES <- fix_colnames(luettu)
 
 #available tournaments
 tournament <- reactiveValues(data = dbSelectAll("TOURNAMENT", con))
+tournament_result <- reactiveValues(data = dbSelectAll("TOURNAMENT_RESULT", con))
 
 move_to <- reactiveValues(tab = "")
 
 update_breakaway_bet <- reactiveValues(data = 0)
+
+
 
 shinyServer(function(input, output, session) {
 
@@ -28,8 +31,21 @@ shinyServer(function(input, output, session) {
  #breakaway_bets_data <-  my_reactivePoll(session, "BREAKAWAY_BET", paste0('SELECT count(TEAM_ID) from BREAKAWAY_BET'), timeout = 1000, con)
  breakaway_cards <-  my_reactivePoll(session, "BREAKAWAY_BET_CARDS", paste0('SELECT * from BREAKAWAY_BET_CARDS'), timeout = 1000, con)
 
+ game_status_simple <-  my_reactivePoll(session, "GAME_STATUS", paste0('SELECT count(GAME_ID) FROM GAME_STATUS'), timeout = 1000, con)
+
+ game_status <- reactive({
+   tn_data <- tournament_result$data[TOURNAMENT_NM == input$join_tournament]
+   #cycler_info <- ADM_CYCLER_INFO[CYCLER_ID %in% tn_data[, CYCLER_ID]]
 
 
+   #create game status
+
+   track <- tn_data[LANE == -1, max(TRACK_ID)]
+   game_id <- tn_data[LANE == -1, max(GAME_ID)]
+   turni <- game_status_simple()[TOURNAMENT_NM == input$join_tournament & GAME_ID == game_id, max(TURN_ID)]
+    gs_curr_turn <- game_status_simple()[TOURNAMENT_NM == input$join_tournament & GAME_ID == game_id & TURN_ID == turni]
+   game_status_local <- create_game_status_from_simple(gs_curr_turn, track,  STG_TRACK, STG_TRACK_PIECE)
+ })
 
 
   react_status <- reactiveValues(phase = 0,

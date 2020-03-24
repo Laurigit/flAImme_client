@@ -79,6 +79,7 @@ observeEvent(input$save_initial_grid, {
 
   dbIns("TOURNAMENT_RESULT", new_row_data, con)
 
+  tournament_result$data <- dbSelectAll("TOURNAMENT_RESULT", con)
 
 })
 
