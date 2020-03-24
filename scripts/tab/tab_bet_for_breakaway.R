@@ -16,6 +16,7 @@ breakaway_bets_data <- reactive({
 ui_control <- reactiveValues(table = FALSE,
                              confirm = FALSE,
                              cards = FALSE,
+                             done = FALSE,
                              input_hand_number = 0)
 betting_phase <- reactive({
 
@@ -101,6 +102,7 @@ observe({
   ui_control$table <- FALSE
   #have I announce who is particitipating?
   card_choises <- c(0, 0)
+  ui_control$done <- FALSE
   if (betting_phase() == 0) {
     ui_control$cards <- FALSE
     ui_control$confirm <- FALSE
@@ -145,10 +147,11 @@ observe({
          }else  {
 
 
-          ui_control$input_hand_number <- 2
+
           ui_control$confirm <- FALSE
           ui_control$cards <- FALSE
           ui_control$table <- TRUE
+          ui_control$done <- TRUE
           shinyjs::disable("which_cycler_to_bet")
           shinyjs::disable("confirm_better")
           shinyjs::disable("save_betted_card")
@@ -170,7 +173,7 @@ observeEvent(input$confirm_better, {
   ins_row <- data.table(TOURNAMENT_NM = input$join_tournament,
                         TEAM_ID = player_reactive$team,
                         CYCLER_ID = find_cycler_id,
-                        GAME_ID = free_game_id(input$join_tournament, con),
+                        GAME_ID = curr_game_id(input$join_tournament, con),
                         FIRST_BET = 0,
                         SECOND_BET = 0)
   update_breakaway_bet$data  <- update_breakaway_bet$data + 1
@@ -227,3 +230,8 @@ if (ui_control$table == TRUE) {
 }
 })
 
+output$betting_done <- renderUI({
+if ( ui_control$done){
+  actionBttn(inputId = "betting_done", label = "I'm done here", style = "float", color = "success", size = "lg")
+}
+})

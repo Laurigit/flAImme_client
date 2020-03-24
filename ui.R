@@ -35,9 +35,10 @@ uusi_peli <- dashboardBody(
     source("./scripts/ui/ui_add_track.R",local = TRUE)$value,
     source("./scripts/ui/ui_start_positions.R",local = TRUE)$value,
     source("./scripts/ui/ui_human_input.R",local = TRUE)$value,
-    source("./scripts/ui/ui_deal_cards.R",local = TRUE)$value,
+   # source("./scripts/ui/ui_deal_cards.R",local = TRUE)$value,
     source("./scripts/ui/ui_play_card.R",local = TRUE)$value,
     source("./scripts/ui/ui_bet_for_breakaway.R",local = TRUE)$value,
+    source("./scripts/ui/ui_game_status.R",local = TRUE)$value,
     source("./scripts/ui/ui_input_other_moves.R",local = TRUE)$value
  #   source("./scripts/ui/ui_manage_deck.R",local = TRUE)$value
     # source("./scripts/ui/ui_pakkaupload.R",local = TRUE)$value,
@@ -60,11 +61,13 @@ sidebar <- dashboardSidebar(
               menuItem("Start positions",icon = icon("bar-chart"), tabName = "tab_start_positions"),
               menuItem("Bet for breakaway", icon = icon("bar-chart"), tabName = "tab_bet_for_breakaway"),
               menuItem("Play cards", icon = icon("bar-chart"), tabName = "tab_human_input"),
+              menuItem("Game status", icon = icon("bar-chart"), tabName = "tab_game_status")
 
-              menuItem('Manage deck',  icon = icon("sliders-h"),tabName = 'tab_manage_deck'),
-              menuItem("Deal cards",icon = icon("bullseye"),tabName = "tab_deal_cards"),
-              menuItem('Play card', icon = icon("tasks") ,tabName = 'tab_play_card'),
-              menuItem('Input human moves',  icon = icon("sliders-h"),tabName = 'tab_input_other_moves')
+
+           #   menuItem('Manage deck',  icon = icon("sliders-h"),tabName = 'tab_manage_deck'),
+            #  menuItem("Deal cards",icon = icon("bullseye"),tabName = "tab_deal_cards"),
+           #   menuItem('Play card', icon = icon("tasks") ,tabName = 'tab_play_card'),
+           #   menuItem('Input human moves',  icon = icon("sliders-h"),tabName = 'tab_input_other_moves')
 
   )
 

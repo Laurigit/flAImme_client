@@ -68,10 +68,9 @@ observeEvent(input$save_initial_grid, {
 
 
 
-
   new_row_data <- data.table(TOURNAMENT_NM = input$join_tournament,
                              GAME_ID =  free_game_id(input$join_tournament, con),
-                             CYCLER_ID = cyclers,
+                             CYCLER_ID = join_ui_to_cycid[, CYCLER_ID],
                              TRACK_ID = track_id,
                              SLOTS_OVER_FINISH = -1,
                              LANE = -1,
