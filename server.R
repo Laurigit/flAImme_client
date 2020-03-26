@@ -21,7 +21,7 @@ shinyServer(function(input, output, session) {
 
 
   reactive({
-
+    browser()
     updateTabItems(session, "sidebarmenu", selected = move_to$tab)
 
   })
@@ -32,6 +32,8 @@ shinyServer(function(input, output, session) {
  breakaway_cards <-  my_reactivePoll(session, "BREAKAWAY_BET_CARDS", paste0('SELECT * from BREAKAWAY_BET_CARDS'), timeout = 1000, con)
 
  game_status_simple <-  my_reactivePoll(session, "GAME_STATUS", paste0('SELECT count(GAME_ID) FROM GAME_STATUS'), timeout = 1000, con)
+
+ deck_status_data <-  my_reactivePoll(session, "DECK_STATUS", paste0('SELECT count(GAME_ID) FROM DECK_STATUS'), timeout = 1000, con)
 
  game_status <- reactive({
    tn_data <- tournament_result$data[TOURNAMENT_NM == input$join_tournament]

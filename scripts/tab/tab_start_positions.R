@@ -41,8 +41,26 @@ observeEvent(input$continue_to_deck_handling, {
 
 })
 
+observeEvent(input$start_game, {
+  move_to$tab <- "tab_game_status"
 
-observeEvent(input$save_initial_grid, {
+  #delete breakaway_bet_cards rows so server knows to start
+  con <- connDB(con, "flaimme")
+  dbQ(paste0('DELETE FROM BREAKAWAY_BET_CARDS WHERE TOURNAMENT_NM = "', input$join_tournament, '"'), con)
+})
+
+observeEvent(input$bet_for_breakaway, {
+  #move everyone to correct page
+
+  move_to$tab <- "tab_bet_for_breakaway"
+})
+
+
+observeEvent(c(
+  input$start_game,
+               input$bet_for_breakaway,
+  1),
+                {
 #games starts from here!
   #get free game id
 
@@ -64,10 +82,6 @@ observeEvent(input$save_initial_grid, {
   #create temp track
   join_ui_to_cycid[, start_pos := seq_len(.N)]
 
-
-
-
-
   new_row_data <- data.table(TOURNAMENT_NM = input$join_tournament,
                              GAME_ID =  free_game_id(input$join_tournament, con),
                              CYCLER_ID = join_ui_to_cycid[, CYCLER_ID],
@@ -81,10 +95,8 @@ observeEvent(input$save_initial_grid, {
 
   tournament_result$data <- dbSelectAll("TOURNAMENT_RESULT", con)
 
-})
+}, ignoreInit = TRUE)
 
 
 
-observeEvent(input$bet_for_breakaway, {
-  move_to$tab <- "tab_bet_for_breakaway"
-})
+o

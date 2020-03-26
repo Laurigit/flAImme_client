@@ -12,6 +12,15 @@ tabItem(tabName = "tab_game_status",
            #        )
           # game_map_both
            plotOutput("game_map_both")
+         ),
+         fluidRow(
+           actionBttn(inputId = "continue_from_game_status",
+                      label = "Continue",
+                      style = "material-flat",
+                      color = "success",
+                      size = "lg",
+                      block = TRUE
+                      )
          )
 
         )
