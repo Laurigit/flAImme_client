@@ -4,7 +4,14 @@ tabItem(tabName = "tab_game_status",
          DT::dataTableOutput(outputId = "players")
           ),
          fluidRow(
-           plotOutput("game_map")
+           # column(6,
+           #        plotOutput("game_map_rouler")
+           #        ),
+           # column(6,
+           #        plotOutput("game_map_sprinter")
+           #        )
+          # game_map_both
+           plotOutput("game_map_both")
          )
 
         )

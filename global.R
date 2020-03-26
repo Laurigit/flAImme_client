@@ -26,7 +26,7 @@ library(ompr.roi)
 library(testthat)
 library(svDialogs)
 library(DT)
-
+library(gridExtra)
 
 
 options(shiny.trace=FALSE)
