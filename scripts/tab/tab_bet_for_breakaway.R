@@ -232,6 +232,6 @@ if (ui_control$table == TRUE) {
 
 output$betting_done <- renderUI({
 if ( ui_control$done){
-  actionBttn(inputId = "betting_done", label = "I'm done here", style = "float", color = "success", size = "lg")
+  actionBttn(inputId = "betting_done", label = "Ready to play", style = "material-flat", color = "success", size = "lg")
 }
 })

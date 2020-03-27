@@ -21,8 +21,8 @@ shinyServer(function(input, output, session) {
 
 
   reactive({
-    browser()
-    updateTabItems(session, "sidebarmenu", selected = move_to$tab)
+    move_to$tab
+    updateTabItems(session, "sidebarmenu", selected = "tab_bet_for_breakaway")
 
   })
 

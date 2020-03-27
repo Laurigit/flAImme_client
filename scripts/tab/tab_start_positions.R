@@ -21,7 +21,7 @@ start_pos_data <- reactive({
 output$cyclersInput <- renderUI({
 
 
-  lapply(c(start_pos_data()[, UI_text], "READY"),
+  lapply(start_pos_data()[, UI_text],
          function(teksti) { tags$h3(drag = teksti,teksti)})
 })
 
@@ -35,6 +35,20 @@ output$ready <- renderUI({
 })
 
 
+observe({
+
+  dragulaValue(input$dragula)$cyclersInput
+  if (is.null(input$dragula)) {
+    shinyjs::disable("start_game")
+    shinyjs::disable("bet_for_breakaway")
+
+  } else {
+    shinyjs::enable("start_game")
+    shinyjs::enable("bet_for_breakaway")
+  }
+
+})
+
 observeEvent(input$continue_to_deck_handling, {
   updateTabItems(session, "sidebarmenu", selected = "tab_manage_deck")
 
@@ -43,16 +57,17 @@ observeEvent(input$continue_to_deck_handling, {
 
 observeEvent(input$start_game, {
   move_to$tab <- "tab_game_status"
-
-  #delete breakaway_bet_cards rows so server knows to start
   con <- connDB(con, "flaimme")
-  dbQ(paste0('DELETE FROM BREAKAWAY_BET_CARDS WHERE TOURNAMENT_NM = "', input$join_tournament, '"'), con)
+  command <- data.table(TOURNAMENT_NM = input$join_tournament, COMMAND = "START")
+  dbIns("CLIENT_COMMANDS", command, con)
+
+  updateTabItems(session, "sidebarmenu", selected = "tab_human_input")
 })
 
 observeEvent(input$bet_for_breakaway, {
   #move everyone to correct page
-
-  move_to$tab <- "tab_bet_for_breakaway"
+  updateTabItems(session, "sidebarmenu", selected = "tab_bet_for_breakaway")
+  move_to$tab <-    move_to$tab + 1
 })
 
 
@@ -99,4 +114,4 @@ observeEvent(c(
 
 
 
-o
+
