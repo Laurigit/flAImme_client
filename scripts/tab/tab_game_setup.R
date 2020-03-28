@@ -1,16 +1,20 @@
 output$select_track <- renderUI({
 #required_data("STG_TRACK")
 
-  data_used <-   eR_TRACK()
+  data_used <-   eR_TRACK()[order(TRACK_NAME)]
 
   #create named list
   my_list <- data_used[, TRACK_ID]
   names(my_list) <- data_used[, TRACK_NAME]
 
+  #max id
+  max_id_track <- max(my_list)
+  pre_selected <- max_id_track
+
   selectInput(inputId = "select_track",
               label = "Select track",
-              choices = my_list)
-
+              choices = my_list,
+              selected = pre_selected)
 })
 
 

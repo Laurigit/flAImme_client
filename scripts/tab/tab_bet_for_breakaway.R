@@ -146,7 +146,9 @@ observe({
         #first find cycler
          }else  {
 
-
+        #tell server we are ready
+           command <- data.table(TOURNAMENT_NM = input$join_tournament, COMMAND = "BREAKAWAY_DONE")
+           dbIns("CLIENT_COMMANDS", command, con)
 
           ui_control$confirm <- FALSE
           ui_control$cards <- FALSE

@@ -39,12 +39,12 @@ observe({
 
   dragulaValue(input$dragula)$cyclersInput
   if (is.null(input$dragula)) {
-    shinyjs::disable("start_game")
-    shinyjs::disable("bet_for_breakaway")
+    shinyjs::disable("save_initial_grid")
+
 
   } else {
-    shinyjs::enable("start_game")
-    shinyjs::enable("bet_for_breakaway")
+    shinyjs::enable("save_initial_grid")
+
   }
 
 })
@@ -62,21 +62,22 @@ observeEvent(input$start_game, {
   dbIns("CLIENT_COMMANDS", command, con)
 
   updateTabItems(session, "sidebarmenu", selected = "tab_human_input")
+  shinyjs::disable("bet_for_breakaway")
+  shinyjs::disable("start_game")
 })
 
 observeEvent(input$bet_for_breakaway, {
   #move everyone to correct page
   updateTabItems(session, "sidebarmenu", selected = "tab_bet_for_breakaway")
   move_to$tab <-    move_to$tab + 1
+  command <- data.table(TOURNAMENT_NM = input$join_tournament, COMMAND = "BREAKAWAY")
+  dbIns("CLIENT_COMMANDS", command, con)
+  shinyjs::disable("bet_for_breakaway")
+  shinyjs::disable("start_game")
 })
 
-
-observeEvent(c(
-  input$start_game,
-               input$bet_for_breakaway,
-  1),
-                {
-#games starts from here!
+observeEvent(input$save_initial_grid, {
+  #games starts from here!
   #get free game id
 
   #get previous game exhaust
@@ -101,6 +102,7 @@ observeEvent(c(
                              GAME_ID =  free_game_id(input$join_tournament, con),
                              CYCLER_ID = join_ui_to_cycid[, CYCLER_ID],
                              TRACK_ID = track_id,
+                             FINISH_TURN = -1,
                              SLOTS_OVER_FINISH = -1,
                              LANE = -1,
                              EXHAUST_LEFT = -1,
@@ -109,6 +111,18 @@ observeEvent(c(
   dbIns("TOURNAMENT_RESULT", new_row_data, con)
 
   tournament_result$data <- dbSelectAll("TOURNAMENT_RESULT", con)
+  command <- data.table(TOURNAMENT_NM = input$join_tournament, COMMAND = "SETUP")
+  dbIns("CLIENT_COMMANDS", command, con)
+  shinyjs::enable("bet_for_breakaway")
+  shinyjs::enable("start_game")
+})
+
+
+observeEvent(c(
+  input$start_game,
+               input$bet_for_breakaway,
+  1),
+                {
 
 }, ignoreInit = TRUE)
 
