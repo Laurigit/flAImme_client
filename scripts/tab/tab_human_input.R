@@ -214,3 +214,52 @@ output$play_or_confirm <- renderUI({
     uiOutput(outputId = "continue_to_game_status")
   }
 })
+
+output$rouler_deck <- DT::renderDataTable({
+  choices_input_all <- deck_status_data()[TOURNAMENT_NM == input$join_tournament & GAME_ID ==  player_reactive$game ]
+  cycler_options <- move_fact$data[TOURNAMENT_NM == input$join_tournament &
+                                     TEAM_ID == player_reactive$team & CARD_ID == -1]
+
+  turni <- choices_input_all[, max (TURN_ID)]
+  choices_input <- choices_input_all[TURN_ID == (turni - 1) & HAND_OPTIONS == 0]
+  cycler_input <- ADM_CYCLER_INFO[CYCLER_TYPE_NAME == "Rouler" & TEAM_ID == player_reactive$team, CYCLER_ID]
+  resdata <- create_deck_stats(choices_input, cycler_input)
+  resdt <- datatable(resdata,  caption = "Rouleur",  rownames = FALSE, options = list(info = FALSE,
+                                                                                      autoWidth = TRUE,
+                                                                                      columnDefs = list(list(width = '10px', targets = "_all")),
+                                                                                      paging = FALSE, dom = 't',ordering = F))
+})
+
+output$sprinter_deck <- DT::renderDataTable({
+  choices_input_all <- deck_status_data()[TOURNAMENT_NM == input$join_tournament & GAME_ID ==  player_reactive$game ]
+  cycler_options <- move_fact$data[TOURNAMENT_NM == input$join_tournament &
+                                     TEAM_ID == player_reactive$team & CARD_ID == -1]
+
+  turni <- choices_input_all[, max (TURN_ID)]
+  choices_input <- choices_input_all[TURN_ID == (turni - 1) & HAND_OPTIONS == 0]
+  cycler_input <- ADM_CYCLER_INFO[CYCLER_TYPE_NAME == "Sprinteur" & TEAM_ID == player_reactive$team, CYCLER_ID]
+  resdata <- create_deck_stats(choices_input, cycler_input)
+  resdt <- datatable(resdata, caption = "Sprinteur", rownames = FALSE, options = list(info = FALSE,
+                                                                                      autoWidth = TRUE,
+                                                                                      columnDefs = list(list(width = '10px', targets = "_all")),
+                                                                                      paging = FALSE,
+                                                                                      dom = 't',ordering = F)) %>% formatStyle(columns = c(1,2,3,4,5), width='1px')
+})
+
+output$other_decks <- DT::renderDataTable({
+  choices_input_all <- deck_status_data()[TOURNAMENT_NM == input$join_tournament & GAME_ID ==  player_reactive$game ]
+  cycler_options <- move_fact$data[TOURNAMENT_NM == input$join_tournament &
+                                     TEAM_ID == player_reactive$team & CARD_ID == -1]
+
+  turni <- choices_input_all[, max (TURN_ID)]
+  choices_input <- choices_input_all[TURN_ID == (turni - 1) & HAND_OPTIONS == 0]
+
+  resdata <- create_comp_deck_status(choices_input, player_reactive$team, ADM_CYCLER_INFO)
+  resdt <- datatable(resdata,  rownames = FALSE, options = list(info = FALSE,
+                                                                                      autoWidth = TRUE,
+                                                                                      columnDefs = list(list(width = '10px', targets = "_all")),
+                                                                                      paging = FALSE,
+                                                                                      dom = 't',ordering = F)) %>% formatStyle(columns = c(1,2,3,4,5), width='1px')
+
+})
+
