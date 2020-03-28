@@ -1,6 +1,6 @@
 create_game_status_from_simple <- function(simple_gs, track_id, STG_TRACK, STG_TRACK_PIECE) {
 
- new_track <- create_track_table(track_id, STG_TRACK_PIECE, STG_TRACK)
+ new_track <- create_track_table(track_id,  STG_TRACK_PIECE, STG_TRACK)
 #set positions
 
 new_track[, CYCLER_ID := as.integer(CYCLER_ID)]

@@ -27,7 +27,7 @@ library(testthat)
 library(svDialogs)
 library(DT)
 library(gridExtra)
-
+library(ggplot2)
 
 options(shiny.trace=FALSE)
 
