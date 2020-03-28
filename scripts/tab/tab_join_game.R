@@ -25,4 +25,14 @@ observeEvent(input$save_me, {
   #find my team id
   player_reactive$tournament <- input$join_tournament
   player_reactive$team <-   max(tournament$data[PLAYER_NM == input$my_name, TEAM_ID])
+
+})
+
+observeEvent(input$join_tournament, {
+  con <- connDB(con, "flaimme")
+  mf_tn <- dbSelectAll("MOVE_FACT", con)[TOURNAMENT_NM == input$join_tournament]
+  max_game <- mf_tn[, max(GAME_ID)]
+  move_fact$data <- mf_tn[GAME_ID == max_game]
+  player_reactive$game <- max_game
+
 })

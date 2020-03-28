@@ -14,10 +14,11 @@ update_breakaway_bet <- reactiveValues(data = 0)
 
 
 shinyServer(function(input, output, session) {
-
+  con <- connDB(con, "flaimme")
   player_reactive <- reactiveValues(name = NULL,
                                     team = NULL,
-                                    tournament = NULL)
+                                    tournament = NULL,
+                                    game = NULL)
 
 
   reactive({
@@ -38,8 +39,8 @@ shinyServer(function(input, output, session) {
  game_status <- reactive({
    tn_data <- tournament_result$data[TOURNAMENT_NM == input$join_tournament]
    #cycler_info <- ADM_CYCLER_INFO[CYCLER_ID %in% tn_data[, CYCLER_ID]]
-
-
+      max_game <- tn_data[, max(GAME_ID)]
+    player_reactive$game <- max_game
    #create game status
 
    track <- tn_data[LANE == -1, max(TRACK_ID)]
@@ -49,20 +50,12 @@ shinyServer(function(input, output, session) {
    game_status_local <- create_game_status_from_simple(gs_curr_turn, track,  STG_TRACK, STG_TRACK_PIECE)
  })
 
-
-  react_status <- reactiveValues(phase = 0,
-                                 cycler_in_turn = 0,
-                                 action_data = NULL,
-                                 turn = 0,
-                                 last_played_card = 0,
-                                 first_cycler = 0,
-                                 game_status = 0,
-                                 deck_status = 0,
-                                 precalc_track_agg = 0,
-                                 ctM_data = 0,
-                                 AI_team = 0,
-                                 range_joined_team = 0,
-                                 game_phase = 0)
+game_status_simple_current_game <- reactive({
+ req(input$join_tournament)
+   max_game <-  game_status_simple()[TOURNAMENT_NM == input$join_tournament, max(GAME_ID)]
+   result <- game_status_simple()[GAME_ID == max_game]
+   result
+ })
 
   sourcelist <- data.table(polku = c(dir("./scripts/", recursive = TRUE)))
   sourcelist[, rivi := seq_len(.N)]

@@ -97,9 +97,9 @@ observeEvent(input$save_initial_grid, {
   #get slots
   #create temp track
   join_ui_to_cycid[, start_pos := seq_len(.N)]
-
+  new_game_id <- free_game_id(input$join_tournament, con)
   new_row_data <- data.table(TOURNAMENT_NM = input$join_tournament,
-                             GAME_ID =  free_game_id(input$join_tournament, con),
+                             GAME_ID =  new_game_id,
                              CYCLER_ID = join_ui_to_cycid[, CYCLER_ID],
                              TRACK_ID = track_id,
                              FINISH_TURN = -1,
@@ -115,6 +115,9 @@ observeEvent(input$save_initial_grid, {
   dbIns("CLIENT_COMMANDS", command, con)
   shinyjs::enable("bet_for_breakaway")
   shinyjs::enable("start_game")
+
+  player_reactive$game <- new_game_id
+  move_fact$data <- dbSelectAll("MOVE_FACT", con)[GAME_ID == player_reactive$game & TOURNAMENT_NM == input$join_tournament]
 })
 
 
