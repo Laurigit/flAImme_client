@@ -1,11 +1,11 @@
-create_track_status_map_FULL <- function(ADM_CYCLER_INFO, game_status) {
+create_track_status_map_scrollable <- function(ADM_CYCLER_INFO, game_status, track_info) {
 
 
 
-   game_status[, lanes_per_slot := max(LANE_NO), by = .(GAME_SLOT_ID)]
-   game_status[, lane_intend := ifelse(lanes_per_slot == 3, 0, ifelse(lanes_per_slot == 2, 0.5, 1))]
+  game_status[, lanes_per_slot := max(LANE_NO), by = .(GAME_SLOT_ID)]
+  game_status[, lane_intend := ifelse(lanes_per_slot == 3, 0, ifelse(lanes_per_slot == 2, 0.5, 1))]
   cycler_pos <- game_status[, .(LANE_graph = 4- LANE_NO - lane_intend, GAME_SLOT_ID, PIECE_ATTRIBUTE, CYCLER_ID, LANE_NO)]
-#browser()
+  #browser()
 
   cyc_type <- ADM_CYCLER_INFO[, .(SHORT_TYPE, CYCLER_ID)]
   joinaa <- cyc_type[cycler_pos, on = "CYCLER_ID"]
@@ -28,15 +28,21 @@ create_track_status_map_FULL <- function(ADM_CYCLER_INFO, game_status) {
   start_slot <- game_status[START == 1, max(GAME_SLOT_ID)]
   join_pa_map[, pa_color_with_finish := ifelse(GAME_SLOT_ID <= start_slot | GAME_SLOT_ID >= finish_slot, 10, pa_color)]
   max_lanes <- game_status[GAME_SLOT_ID <= finish_slot, max(LANE_NO)]
-  filter_lanes <- join_pa_map[LANE_NO <= max_lanes]
-  filter_lanes[, SLOT_Y_AXIS := GAME_SLOT_ID - start_slot + 1]
-  last_visualized_slot <- finish_slot - start_slot + 2
+  first_extra_slot <- game_status[LANE_NO > 3, min(GAME_SLOT_ID)]
+  filter_lanes <- join_pa_map[GAME_SLOT_ID < first_extra_slot]
+  filter_lanes[, SLOT_Y_AXIS := GAME_SLOT_ID]
+
+  aggr_slot_coord <- track_info[, .N, by = .(GAME_SLOT_ID, SLOT_COORD)][, N := NULL]
+
+  first_visualized_slot <- filter_lanes[CYCLER_ID > 0, min(GAME_SLOT_ID)] - 1
+  last_visualized_slot <- filter_lanes[, max(GAME_SLOT_ID)] + 1
+  labels <- aggr_slot_coord[GAME_SLOT_ID >= first_visualized_slot & GAME_SLOT_ID <= last_visualized_slot, SLOT_COORD]
 
   p1 <- ggplot(filter_lanes,
                aes(x = LANE_graph, y = SLOT_Y_AXIS, fill = factor(color_id))) +
     #geom_tile(color = "gray", size = 5) +
-    geom_tile(aes( color=as.factor(pa_color_with_finish), width = 1, height = 0.5), size=0.75) +
-    geom_text(aes(label = SHORT_TYPE, color = as.factor(font_color)), size = 1) +
+    geom_tile(aes( color=as.factor(pa_color_with_finish), width = 1, height = 0.92), size = 1.2) +
+    geom_text(aes(label = SHORT_TYPE, color = as.factor(font_color)), size = 12) +
     scale_fill_manual(values=c("1" = "red",
                                "2" = "blue3",
                                "3" = "black",
@@ -64,15 +70,16 @@ create_track_status_map_FULL <- function(ADM_CYCLER_INFO, game_status) {
     theme(axis.title.x=element_blank(),
           axis.title.y=element_blank(),
           axis.text.x = element_blank(),
-          axis.text.y = element_blank(),
-          axis.ticks.y=element_blank(),
           axis.ticks.x=element_blank(),
+          axis.ticks.y = element_blank(),
+          axis.text.y = element_text(size=20, hjust = 1) ,
+       #   axis.text.y = element_text(size = 10, hjust = -5),
           legend.position = "none",
           panel.background = element_rect(fill = "white", colour = "white", size = 0.5)
     ) +
     scale_x_continuous(limits = c(3.5 - max_lanes ,3.5), expand = c(0, 0)) +
 
-    scale_y_continuous(limits = c(0, last_visualized_slot), expand = c(0, 0), breaks = c(0.5 + rep(0:last_visualized_slot)),
-                       label = c(rep(0:(last_visualized_slot))))
+    scale_y_continuous(limits = c(first_visualized_slot, last_visualized_slot), expand = c(0, 0), breaks = c(1 + rep(first_visualized_slot:(last_visualized_slot - 1))),
+                       label = labels)
   return(p1)
 }

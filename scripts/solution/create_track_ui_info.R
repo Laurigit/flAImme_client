@@ -24,6 +24,7 @@ sort[, ':=' (
              )]
 sort[, COORD := ifelse(LANE_NO == 1, paste0(TRACK_PIECE_ID_GAME, "-" ,PIECE_SLOT),
                        paste0(TRACK_PIECE_ID_GAME, "-" ,PIECE_SLOT, ":", LANE_NO))]
+sort[, SLOT_COORD := paste0(TRACK_PIECE_ID_GAME, "-" , PIECE_SLOT)]
 
 return(sort)
 }

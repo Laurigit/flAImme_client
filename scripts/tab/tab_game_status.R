@@ -13,7 +13,7 @@ output$players <-  renderDataTable({
 
   #game_status_local <- create_game_status_from_simple(game_status(), track, STG_TRACK, STG_TRACK_PIECE)
   #get cycler position
-  track_info <- create_track_ui_info(STG_TRACK, STG_TRACK_PIECE, track)
+  track_info <- create_track_ui_info(STG_TRACK, STG_TRACK_PIECE, 1)
   coords <- conv_square_to_coord(game_status(), track_info)
   sscols_coords <- coords[, .(CYCLER_ID, COORD)]
   sscols_coords
@@ -73,15 +73,13 @@ output$players <-  renderDataTable({
 
 
 
-output$game_map_both <- renderPlot({
+output$game_map_full <- renderPlot({
 
 
 
-  my_cycler <- ADM_CYCLER_INFO[TEAM_ID == player_reactive$team & CYCLER_TYPE_NAME == "Rouler", CYCLER_ID]
-
-p1 <- create_track_status_map_FULL(my_cycler, ADM_CYCLER_INFO, game_status())
 
 
+p1 <- create_track_status_map_FULL(ADM_CYCLER_INFO, game_status())
 
   # my_cycler <- ADM_CYCLER_INFO[TEAM_ID == player_reactive$team & CYCLER_TYPE_NAME == "Sprinteur", CYCLER_ID]
   #
@@ -91,6 +89,18 @@ p1 <- create_track_status_map_FULL(my_cycler, ADM_CYCLER_INFO, game_status())
   # grid.arrange(p1, p2, nrow = 1, ncol = 2)
 p1
 
+})
+
+output$game_map_scroll <- renderPlot({
+  tn_data <- tournament_result$data[TOURNAMENT_NM == input$join_tournament]
+
+
+
+  track <- tn_data[LANE == -1, max(TRACK_ID)]
+
+  track_info <- create_track_ui_info(STG_TRACK, STG_TRACK_PIECE, track)
+  p2 <- create_track_status_map_scrollable(ADM_CYCLER_INFO, game_status(), track_info)
+  p2
 })
 
 

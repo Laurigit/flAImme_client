@@ -1,5 +1,5 @@
 tabItem(tabName = "tab_game_status",
-        fillPage(
+        fluidPage(
           # fluidRow(
           #   actionBttn(inputId = "continue_from_game_status",
           #              label = "Continue",
@@ -12,24 +12,18 @@ tabItem(tabName = "tab_game_status",
 
          # fluidRow(
           #  DT::dataTableOutput(outputId = "players")
-            div(style = 'height:1200; overflow-y: scroll',
-            plotOutput("game_map_both")
+
+           # splitLayout(plotOutput("game_map_full"),
+
+
+            # div(style = 'height:1000px; overflow-y: scroll',
+            #     plotOutput("game_map_scroll")
+            # )
+          splitLayout(plotOutput("game_map_full"),
+            div(style = 'height: 900px;, overflow-y: scroll',
+                plotOutput("game_map_scroll")
             )
-         #   column(6, ),
-          #  column(6,    )
-
-        #  )
-
-           # column(6,
-           #        plotOutput("game_map_rouler")
-           #        ),
-           # column(6,
-           #        plotOutput("game_map_sprinter")
-           #        )
-          # game_map_both
-           # div(style = 'height:600px; overflow-y: scroll',
-           #     plotOutput("game_map_both")
-           # )
+          )
 
 
 
