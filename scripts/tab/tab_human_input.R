@@ -130,9 +130,10 @@ played_card_status <- reactive({
 
    if (cyclers_left  == 0) {
      status <- 4
-   } else if (first_cycler_selected == FALSE) {
+   } else if (current_turn > 0 & first_cycler_selected == FALSE) {
     #I need to choose cycler
      updateTabItems(session, "sidebarmenu", selected = "tab_game_status")
+     print("TAB CHANGED IN played card reactive")
      status <- 1
    }  else if (how_many_played == 0) {
      # i need to choose first card
@@ -142,6 +143,7 @@ played_card_status <- reactive({
       status <- 3
      } else if (missing_total > 0) {
        updateTabItems(session, "sidebarmenu", selected = "tab_human_input")
+       tournament_result$data <- dbSelectAll("TOURNAMENT_RESULT", con)
        status <- 4
      } else {
        status <- 5

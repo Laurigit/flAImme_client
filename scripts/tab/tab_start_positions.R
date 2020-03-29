@@ -76,6 +76,34 @@ observeEvent(input$bet_for_breakaway, {
   shinyjs::disable("start_game")
 })
 
+
+observe({
+req(input$join_tournament)
+  browser()
+  newest_game <- game_status_simple_current_game()[, max(GAME_ID)]
+  newest_game_turn <- game_status_simple_current_game()[GAME_ID == newest_game, max(TURN_ID)]
+  players_in_latest_game <- tournament_result$data[TOURNAMENT_NM == input$join_tournament & GAME_ID == newest_game, .N]
+  finished_players <- tournament_result$data[TOURNAMENT_NM == input$join_tournament & GAME_ID == newest_game & FINISH_TURN > 0, .N]
+  latest_game_finished <- players_in_latest_game == finished_players
+
+  if (latest_game_finished) {
+    #pevious game started, no new
+    shinyjs::enable("save_initial_grid")
+    shinyjs::disable("bet_for_breakaway")
+    shinyjs::disable("start_game")
+  } else if ( latest_game_finished == FALSE & newest_game_turn < 1) {
+    #start game pressend, but not continued
+    shinyjs::disable("save_initial_grid")
+  shinyjs::enable("bet_for_breakaway")
+  shinyjs::enable("start_game")
+} else {
+  #game on
+  shinyjs::disable("save_initial_grid")
+  shinyjs::disable("bet_for_breakaway")
+  shinyjs::disable("start_game")
+}
+})
+
 observeEvent(input$save_initial_grid, {
   #games starts from here!
   #get free game id
