@@ -7,7 +7,9 @@
 uusi_peli <- dashboardBody(
 
   useShinyjs(),
-  tags$style(type = "text/css", "#game_map_both {height: calc(100vh - 80px) !important;}"),
+ # tags$style(type = "text/css", "#game_map_full {height: calc(98vh - 130px) !important;}"),
+ tags$style(type = "text/css", "#game_map_full {height: 810px !important;}"),
+  tags$style(type = "text/css", "#game_map_scroll {height: calc(400vh - 80px) !important;}"),
   tags$script("$(\"input:radio[name='blue_setup'][value='Human']\").parent().css('background-color', '#DE6B63');"),
 
   tags$head(

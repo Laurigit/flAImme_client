@@ -1,41 +1,75 @@
 #tab_human_input
-output$select_played_card <- renderUI({
 
-  choices_input_all <- deck_status_data()[TOURNAMENT_NM == input$join_tournament & GAME_ID ==  player_reactive$game ]
-  cycler_options <- move_fact$data[TOURNAMENT_NM == input$join_tournament &
-                                    TEAM_ID == player_reactive$team & CARD_ID == -1]
+observeEvent(input$show_map, {
+  updateTabItems(session, "sidebarmenu", selected = "tab_game_status")
+})
 
-  turni <- choices_input_all[, max (TURN_ID)]
-  choices_input <- choices_input_all[TURN_ID == turni]
-  if (played_card_status() == 2) {
-    moving_cycler <- cycler_options[FIRST_SELECTED == 1, CYCLER_ID]
-  } else if (played_card_status() == 3) {
-    moving_cycler <- cycler_options[FIRST_SELECTED == 0, CYCLER_ID]
-  }  else ({
-   # move_to$tab <- "tab_game_status"
-    #updateTabItems(session, "sidebarmenu", selected = "tab_game_status")
-    moving_cycler <- 0
-  })
+output$players <-  renderDataTable({
 
-  my_type <- ADM_CYCLER_INFO[CYCLER_ID == moving_cycler, CYCLER_TYPE_NAME]
+  tn_data <- tournament_result$data[TOURNAMENT_NM == input$join_tournament]
+  cycler_info <- ADM_CYCLER_INFO[CYCLER_ID %in% tn_data[, CYCLER_ID]]
+  cycler_info
 
-  card_options <- choices_input[CYCLER_ID == moving_cycler & Zone == "Hand", CARD_ID]
-  fluidRow(
-           column(4,
-                  disabled(actionBttn(inputId = "confirm_selected_card", label = "Confirm played card",
-                             style = "material-flat", size = "lg", block = TRUE))
-           ),
-           column(4, offset = 4, radioGroupButtons(inputId = "select_played_card",
-                    label = paste0(my_type, ": select card"),
-                    selected = -1,
-                    status = "success",
-                    size = "lg",
-                    direction = "vertical",
-                    choices = card_options,
-                    width = "100%"
-                    ))
-           )
+  #create game status
 
+  track <- tn_data[LANE == -1, max(TRACK_ID)]
+
+  #game_status_local <- create_game_status_from_simple(game_status(), track, STG_TRACK, STG_TRACK_PIECE)
+  #get cycler position
+  track_info <- create_track_ui_info(STG_TRACK, STG_TRACK_PIECE, 1)
+  coords <- conv_square_to_coord(game_status(), track_info)
+  sscols_coords <- coords[, .(CYCLER_ID, COORD)]
+  sscols_coords
+
+  cycler_names <-tournament$data[,. (TEAM_ID, PLAYER_NM)]
+
+  join_info <- ADM_CYCLER_INFO[sscols_coords, on = "CYCLER_ID"]
+  join_names <- cycler_names[join_info, on = "TEAM_ID"]
+
+
+  gs_local <- game_status_simple_current_game()
+
+  turni_used <- gs_local[, max(TURN_ID)]
+  if (turni_used > 0) {
+
+    posits_prev <- create_game_status_from_simple(gs_local[TURN_ID == (turni_used - 1)],
+                                                  track,
+                                                  STG_TRACK,
+                                                  STG_TRACK_PIECE
+    )[CYCLER_ID > 0, .(GSID_OLD = GAME_SLOT_ID, CYCLER_ID)]
+    posits_after <- create_game_status_from_simple(gs_local[TURN_ID == (turni_used )],
+                                                   track,
+                                                   STG_TRACK,
+                                                   STG_TRACK_PIECE
+    )[CYCLER_ID > 0, .(GAME_SLOT_ID, CYCLER_ID)]
+    joinaa <- posits_prev[posits_after, on = "CYCLER_ID"]
+    joinaa[, MOVEMENT_GAINED := GAME_SLOT_ID - GSID_OLD]
+
+    prev_actions_turn <- move_fact$data[TURN_ID == turni_used, .(CYCLER_ID, CARD_PLAYED = CARD_ID)]
+
+    ex_before <-  deck_status_curr_game()[CARD_ID == 1 & HAND_OPTIONS == 1 & TURN_ID == turni_used, .(EXH_BEFORE = .N), by = .(CYCLER_ID)]
+    ex_after <-  deck_status_curr_game()[CARD_ID == 1 & HAND_OPTIONS == 0 & TURN_ID == turni_used, .(EXH_AFTER = .N), by = .(CYCLER_ID)]
+
+    joinaa_ex <- ex_before[ex_after, on = "CYCLER_ID"]
+    joinaa_ex[is.na(EXH_BEFORE), EXH_BEFORE := 0]
+    joinaa_ex[, EX_GAINED := EXH_AFTER - EXH_BEFORE]
+
+    join_ex_to_names <- joinaa_ex[join_names, on = "CYCLER_ID"]
+    join_acts <- prev_actions_turn[join_ex_to_names, on = "CYCLER_ID"]
+    join_move <-joinaa[join_acts, on = "CYCLER_ID"]
+
+    sscols_info <- join_move[order(CYCLER_ID)][, .(Player = PLAYER_NM, Team = TEAM_COLOR, Rider = SHORT_TYPE, Position = COORD, Played = CARD_PLAYED,
+                                                   Moves = MOVEMENT_GAINED,
+                                                   Exhaust = EX_GAINED
+    )]
+
+    datatable(sscols_info,  rownames = FALSE, options = list(info = FALSE, paging = FALSE, dom = 't',ordering = F)) %>% formatStyle(
+      'Team',
+      target = 'row',
+      color = styleEqual(c("Red", "Blue", "Green", "Black", "White", "Purple"), c("white", "white", "white", "white", "black", "black")),
+      backgroundColor = styleEqual(c("Red", "Blue", "Green", "Black", "White", "Purple"), c('red', 'blue', 'green', 'black', 'white', 'pink'))
+    )
+  }
 })
 observeEvent(input$select_played_card, {
   if (is.null(input$confirm_selected_card)) {
@@ -66,86 +100,9 @@ observeEvent(input$confirm_selected_card, {
 })
 
 
-output$select_which_cycler_plays_first <- renderUI({
-
-  #check which cyclers I have left
-  gs_data <- game_status_simple_current_game()
-  max_gs_turn <- gs_data[, max(TURN_ID)]
-
-
-  cyclers_left <- gs_data[TURN_ID == max_gs_turn & CYCLER_ID > 0, CYCLER_ID]
-  my_options <- ADM_CYCLER_INFO[CYCLER_ID %in% cyclers_left & TEAM_ID == player_reactive$team, CYCLER_TYPE_NAME]
-
-  fluidRow(column(6,
-                  actionBttn(inputId = "confim_first_played_cycler",
-                             label = "Confirm",
-                             style = "material-flat",
-                             color = "primary",
-                             size = "lg",
-                             block = FALSE)),
-           column(6, radioGroupButtons(inputId = "radio_first_cycler",
-                                       label = "Select first cycler to play",
-                                       choices = my_options,
-                                       selected = NULL,
-                                       status = "info",
-                                       direction = "vertical",
-                                       size = "lg",
-                                       width = "100%")))
-})
 
 
 
-
-observeEvent(input$confim_first_played_cycler, {
-   selected_cycler <- ADM_CYCLER_INFO[CYCLER_TYPE_NAME == input$radio_first_cycler & TEAM_ID == player_reactive$team, CYCLER_ID]
-
-
-   gs_data <- game_status_simple_current_game()
-   max_gs_turn <- gs_data[, max(TURN_ID)]
-
-   cyclers_left <- gs_data[TURN_ID == max_gs_turn & CYCLER_ID > 0, CYCLER_ID]
-
-
-   my_options <- ADM_CYCLER_INFO[CYCLER_ID %in% cyclers_left & TEAM_ID == player_reactive$team, .N]
-
-
-
-  #write to db update UI
-  con <- connDB(con, "flaimme")
-
-  turni <- get_current_turn(input$join_tournament, game_status_simple_current_game(), con)
-  game <- curr_game_id(input$join_tournament, con)
-
-  write_data_first <- data.table(TOURNAMENT_NM = input$join_tournament,
-                           FIRST_SELECTED = 1,
-                           CYCLER_ID = selected_cycler,
-                           CARD_ID = -1,
-                           GAME_ID = game,
-                           TURN_ID = turni,
-                           TEAM_ID = player_reactive$team)
-
-
-  if (my_options == 2) {
-    second_cycler <- ADM_CYCLER_INFO[CYCLER_TYPE_NAME != input$radio_first_cycler & TEAM_ID == player_reactive$team, CYCLER_ID]
-    write_data_second <- data.table(TOURNAMENT_NM = input$join_tournament,
-                                    FIRST_SELECTED = 0,
-                                    CYCLER_ID = second_cycler,
-                                    CARD_ID = -1,
-                                    TURN_ID = turni,
-                                    GAME_ID = game,
-                                    TEAM_ID = player_reactive$team )
-  } else {
-    write_data_second <- NULL
-  }
-
-
-  appendaa <- rbind(write_data_first, write_data_second)
-
-
-  con <- connDB(con, "flaimme")
-  dbWriteTable(con, "MOVE_FACT", appendaa, row.names = FALSE, append = TRUE)
-  move_fact$data <- dbSelectAll("MOVE_FACT", con)[GAME_ID == player_reactive$game & TOURNAMENT_NM == input$join_tournament]
-})
 con <- connDB(con, "flaimme")
 move_fact <- reactiveValues(data = NULL)
 
@@ -171,6 +128,7 @@ played_card_status <- reactive({
      status <- 4
    } else if (first_cycler_selected == FALSE) {
     #I need to choose cycler
+     updateTabItems(session, "sidebarmenu", selected = "tab_game_status")
      status <- 1
    }  else if (how_many_played == 0) {
      # i need to choose first card
@@ -179,7 +137,7 @@ played_card_status <- reactive({
        #i need to choose 2nd card
       status <- 3
      } else if (missing_total > 0) {
-       #i am ready, waiting others
+       updateTabItems(session, "sidebarmenu", selected = "tab_human_input")
        status <- 4
      } else {
        status <- 5
@@ -200,20 +158,7 @@ observeEvent(input$continue_to_game_status_from_select_card,{
   updateTabItems(session, "sidebarmenu", selected = "tab_game_status")
 })
 
-output$play_or_confirm <- renderUI({
 
-  shinyjs::disable("confirm_selected_card")
-  if (played_card_status() == 1) {
-    uiOutput("select_which_cycler_plays_first")
-  } else if(played_card_status() == 2) {
-
-    uiOutput(outputId = "select_played_card")
-  } else if(played_card_status() == 3) {
-    uiOutput(outputId = "select_played_card")
-  } else {
-    uiOutput(outputId = "continue_to_game_status")
-  }
-})
 
 output$rouler_deck <- DT::renderDataTable({
   choices_input_all <- deck_status_data()[TOURNAMENT_NM == input$join_tournament & GAME_ID ==  player_reactive$game ]

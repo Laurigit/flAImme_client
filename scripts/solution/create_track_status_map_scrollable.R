@@ -79,7 +79,7 @@ create_track_status_map_scrollable <- function(ADM_CYCLER_INFO, game_status, tra
     ) +
     scale_x_continuous(limits = c(3.5 - max_lanes ,3.5), expand = c(0, 0)) +
 
-    scale_y_continuous(limits = c(first_visualized_slot, last_visualized_slot), expand = c(0, 0), breaks = c(1 + rep(first_visualized_slot:(last_visualized_slot - 1))),
+    scale_y_continuous(limits = c(first_visualized_slot, last_visualized_slot), expand = c(0, 0), breaks = c(rep((first_visualized_slot):(last_visualized_slot - 1))),
                        label = labels)
   return(p1)
 }
