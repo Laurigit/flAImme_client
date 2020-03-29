@@ -79,7 +79,7 @@ observeEvent(input$bet_for_breakaway, {
 
 observe({
 req(input$join_tournament)
-  browser()
+
   newest_game <- game_status_simple_current_game()[, max(GAME_ID)]
   newest_game_turn <- game_status_simple_current_game()[GAME_ID == newest_game, max(TURN_ID)]
   players_in_latest_game <- tournament_result$data[TOURNAMENT_NM == input$join_tournament & GAME_ID == newest_game, .N]
