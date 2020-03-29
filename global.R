@@ -32,6 +32,7 @@ library(ggplot2)
 options(shiny.trace=FALSE)
 
 
+
 sourcelist <- data.table(polku = c(dir("./scripts/", recursive = TRUE)))
 sourcelist[, rivi := seq_len(.N)]
 sourcelist[, kansio := strsplit(polku, split = "/")[[1]][1], by = rivi]

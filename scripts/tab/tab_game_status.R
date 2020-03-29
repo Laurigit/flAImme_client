@@ -79,16 +79,17 @@ output$game_map_both <- renderPlot({
 
   my_cycler <- ADM_CYCLER_INFO[TEAM_ID == player_reactive$team & CYCLER_TYPE_NAME == "Rouler", CYCLER_ID]
 
-p1 <- create_track_status_map(my_cycler, ADM_CYCLER_INFO, game_status())
+p1 <- create_track_status_map_FULL(my_cycler, ADM_CYCLER_INFO, game_status())
 
 
 
-  my_cycler <- ADM_CYCLER_INFO[TEAM_ID == player_reactive$team & CYCLER_TYPE_NAME == "Sprinteur", CYCLER_ID]
-
-  p2 <- create_track_status_map(my_cycler, ADM_CYCLER_INFO, game_status())
-
-
-  grid.arrange(p1, p2, nrow = 1, ncol = 2)
+  # my_cycler <- ADM_CYCLER_INFO[TEAM_ID == player_reactive$team & CYCLER_TYPE_NAME == "Sprinteur", CYCLER_ID]
+  #
+  # p2 <- create_track_status_map(my_cycler, ADM_CYCLER_INFO, game_status())
+  #
+  #
+  # grid.arrange(p1, p2, nrow = 1, ncol = 2)
+p1
 
 })
 
