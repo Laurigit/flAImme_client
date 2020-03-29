@@ -1,9 +1,15 @@
 create_track_status_map_FULL <- function(ADM_CYCLER_INFO, game_status) {
 
 
+  finish_slot <- game_status[FINISH == 1, max(GAME_SLOT_ID)]
+  max_lanes <- game_status[GAME_SLOT_ID <= finish_slot, max(LANE_NO)]
+  game_status[, lanes_per_slot := max(LANE_NO), by = .(GAME_SLOT_ID)]
+  if (max_lanes == 3) {
+    game_status[, lane_intend := ifelse(lanes_per_slot == 3, 0, ifelse(lanes_per_slot == 2, 0.5, 1))]
+  } else {
+    game_status[, lane_intend := ifelse(lanes_per_slot == 2, 0, 0.5)]
+  }
 
-   game_status[, lanes_per_slot := max(LANE_NO), by = .(GAME_SLOT_ID)]
-   game_status[, lane_intend := ifelse(lanes_per_slot == 3, 0, ifelse(lanes_per_slot == 2, 0.5, 1))]
   cycler_pos <- game_status[, .(LANE_graph = 4- LANE_NO - lane_intend, GAME_SLOT_ID, PIECE_ATTRIBUTE, CYCLER_ID, LANE_NO)]
 #browser()
 
@@ -24,10 +30,10 @@ create_track_status_map_FULL <- function(ADM_CYCLER_INFO, game_status) {
 
   #dont shoe more lanes than needed
 
-  finish_slot <- game_status[FINISH == 1, max(GAME_SLOT_ID)]
+
   start_slot <- game_status[START == 1, max(GAME_SLOT_ID)]
   join_pa_map[, pa_color_with_finish := ifelse(GAME_SLOT_ID <= start_slot | GAME_SLOT_ID >= finish_slot, 10, pa_color)]
-  max_lanes <- game_status[GAME_SLOT_ID <= finish_slot, max(LANE_NO)]
+
   filter_lanes <- join_pa_map[LANE_NO <= max_lanes]
   filter_lanes[, SLOT_Y_AXIS := GAME_SLOT_ID - start_slot + 1]
   last_visualized_slot <- finish_slot - start_slot + 2

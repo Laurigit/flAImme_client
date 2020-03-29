@@ -120,7 +120,7 @@ observeEvent(input$confim_first_played_cycler, {
 })
 
 output$play_or_confirm <- renderUI({
-
+req(played_card_status())
   shinyjs::disable("confirm_selected_card")
   if (played_card_status() == 1) {
     uiOutput("select_which_cycler_plays_first")

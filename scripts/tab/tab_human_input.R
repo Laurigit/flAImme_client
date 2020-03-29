@@ -107,6 +107,10 @@ con <- connDB(con, "flaimme")
 move_fact <- reactiveValues(data = NULL)
 
 played_card_status <- reactive({
+  req(input$join_tournament)
+    req( move_fact$data)
+    req(player_reactive$team)
+  print("played_card_status_react")
 
   #check if we are waiting for others to finish
   gid <- curr_game_id(input$join_tournament, con)
@@ -144,6 +148,11 @@ played_card_status <- reactive({
      }
 return(status)
 
+})
+
+observeEvent(played_card_status(), {
+
+  session$sendCustomMessage(type = "scrollCallback", 1)
 })
 
 output$act_button_continue <- renderUI({
