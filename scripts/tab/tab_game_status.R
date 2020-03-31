@@ -9,7 +9,7 @@
 output$game_map_full <- renderPlot({
 
 
-
+req( game_status())
 
 
 p1 <- create_track_status_map_FULL(ADM_CYCLER_INFO, game_status())
@@ -25,6 +25,7 @@ p1
 })
 
 output$game_map_scroll <- renderPlot({
+
   tn_data <- tournament_result$data[TOURNAMENT_NM == input$join_tournament]
 
 

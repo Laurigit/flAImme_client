@@ -1,6 +1,5 @@
 create_track_status_map_scrollable <- function(ADM_CYCLER_INFO, game_status, track_info) {
 
-
   finish_slot <- game_status[FINISH == 1, max(GAME_SLOT_ID)]
   max_lanes <- game_status[GAME_SLOT_ID <= finish_slot, max(LANE_NO)]
   game_status[, lanes_per_slot := max(LANE_NO), by = .(GAME_SLOT_ID)]

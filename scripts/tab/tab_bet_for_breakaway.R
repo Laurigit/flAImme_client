@@ -3,6 +3,7 @@
 
 
 breakaway_bets_data <- reactive({
+  print("reactive breakaway_bets_data")
   #dep
   update_breakaway_bet$data
   ##########3
@@ -19,7 +20,7 @@ ui_control <- reactiveValues(table = FALSE,
                              done = FALSE,
                              input_hand_number = 0)
 betting_phase <- reactive({
-
+  print("reactive betting_phase")
 req(player_reactive$team)
 #phases
   #0 I have not selected participant
@@ -71,6 +72,7 @@ req(player_reactive$team)
 
 
 output$breakaway_options <- renderUI({
+  print("output betting_phase")
 if (ui_control$cards) {
   my_cycler <- breakaway_bets_data()[TEAM_ID == player_reactive$team, CYCLER_ID]
   card_choises <-  breakaway_cards()[CYCLER_ID == my_cycler & HAND_NUMBER == ui_control$input_hand_number & TOURNAMENT_NM == input$join_tournament, CARD_ID]
@@ -90,6 +92,7 @@ if (ui_control$cards) {
   })
 
 observe({
+  print("output breakaway_cards")
   req(breakaway_cards())
 
   req(breakaway_bets_data(),  input$join_tournament, player_reactive$team)
@@ -146,14 +149,12 @@ observe({
         #first find cycler
          }else  {
 
-        #tell server we are ready
-           command <- data.table(TOURNAMENT_NM = input$join_tournament, COMMAND = "BREAKAWAY_DONE")
-           dbIns("CLIENT_COMMANDS", command, con)
 
           ui_control$confirm <- FALSE
           ui_control$cards <- FALSE
           ui_control$table <- TRUE
           ui_control$done <- TRUE
+
           shinyjs::disable("which_cycler_to_bet")
           shinyjs::disable("confirm_better")
           shinyjs::disable("save_betted_card")
@@ -211,6 +212,8 @@ observeEvent(input$save_betted_card, {
 })
 
 output$breakaway_results <- renderTable({
+  print("breakaway results output")
+
 if (ui_control$table == TRUE) {
   req(breakaway_bets_data(),  input$join_tournament)
 
@@ -236,4 +239,8 @@ output$betting_done <- renderUI({
 if ( ui_control$done){
   actionBttn(inputId = "betting_done", label = "Ready to play", style = "material-flat", color = "success", size = "lg")
 }
+})
+
+observeEvent(input$betting_done, {
+  updateTabItems(session, "sidebarmenu", selected = "tab_game_status")
 })

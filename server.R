@@ -32,9 +32,9 @@ shinyServer(function(input, output, session) {
  #breakaway_bets_data <-  my_reactivePoll(session, "BREAKAWAY_BET", paste0('SELECT count(TEAM_ID) from BREAKAWAY_BET'), timeout = 1000, con)
  breakaway_cards <-  my_reactivePoll(session, "BREAKAWAY_BET_CARDS", paste0('SELECT * from BREAKAWAY_BET_CARDS'), timeout = 1000, con)
 
- game_status_simple <-  my_reactivePoll(session, "GAME_STATUS", paste0('SELECT sum(TURN_ID) FROM GAME_STATUS'), timeout = 1000, con)
+ game_status_simple <-  my_reactivePoll(session, "GAME_STATUS", paste0('SELECT sum(CYCLER_ID) FROM GAME_STATUS'), timeout = 1000, con)
 
- deck_status_data <-  my_reactivePoll(session, "DECK_STATUS", paste0('SELECT sum(TURN_ID) FROM DECK_STATUS'), timeout = 1000, con)
+ deck_status_data <-  my_reactivePoll(session, "DECK_STATUS", paste0('SELECT sum(CYCLER_ID) FROM DECK_STATUS'), timeout = 1000, con)
 
  deck_status_curr_game <- reactive({
 
@@ -51,6 +51,9 @@ shinyServer(function(input, output, session) {
 
 
  game_status <- reactive({
+
+   if (nrow(game_status_simple()) > 0) {
+
    tn_data <- tournament_result$data[TOURNAMENT_NM == input$join_tournament]
    #cycler_info <- ADM_CYCLER_INFO[CYCLER_ID %in% tn_data[, CYCLER_ID]]
       max_game <- tn_data[, max(GAME_ID)]
@@ -61,8 +64,10 @@ shinyServer(function(input, output, session) {
    game_id <- tn_data[LANE == -1, max(GAME_ID)]
    turni <- game_status_simple()[TOURNAMENT_NM == input$join_tournament & GAME_ID == game_id, max(TURN_ID)]
     gs_curr_turn <- game_status_simple()[TOURNAMENT_NM == input$join_tournament & GAME_ID == game_id & TURN_ID == turni]
-
    game_status_local <- create_game_status_from_simple(gs_curr_turn, track,  STG_TRACK, STG_TRACK_PIECE)
+   } else {
+     NULL
+   }
  })
 
 game_status_simple_current_game <- reactive({

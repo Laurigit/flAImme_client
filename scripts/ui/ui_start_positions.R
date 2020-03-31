@@ -9,9 +9,11 @@ fluidPage(
         h3(HTML(("Change order at least once to enable save buttons"))),
        # column(width = 3, h2("Breakaway"), uiOutput("cyclersPeloton", style = "min-height:200px;background-color:white;")),
        # column(width = 3, h2("Move ready here"), uiOutput("ready", style = "min-height:200px;background-color:white;")),
-        actionButton("save_initial_grid", "Save grid order", width = "33%"),
-        disabled(actionButton("bet_for_breakaway", "Bet for breakaway", width = "33%")),
-        disabled(actionButton("start_game", "Start game", width = "33%"))
+        actionButton("save_initial_grid", "Save grid order", width = "25%"),
+        disabled(actionButton("bet_for_breakaway", "Bet for breakaway", width = "25%")),
+        disabled(actionButton("start_game", "Start game", width = "25%")),
+       actionButton("start_after_betting", "Start after betting game", width = "25%")
+
 
 )),
 dragula(c("cyclersInput"), id = "dragula")

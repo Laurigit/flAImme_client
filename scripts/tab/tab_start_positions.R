@@ -11,7 +11,7 @@
 
 
 start_pos_data <- reactive({
-
+print("start_pos_data")
   curr_tour_cyclers <- tournament$data[TOURNAMENT_NM == input$join_tournament, TEAM_ID]
   curr_info <- ADM_CYCLER_INFO[TEAM_ID %in% curr_tour_cyclers]
   curr_info
@@ -67,9 +67,11 @@ observeEvent(input$start_game, {
 })
 
 observeEvent(input$bet_for_breakaway, {
+  print("bet_for_breakaway")
+
   #move everyone to correct page
   updateTabItems(session, "sidebarmenu", selected = "tab_bet_for_breakaway")
-  move_to$tab <-    move_to$tab + 1
+
   command <- data.table(TOURNAMENT_NM = input$join_tournament, COMMAND = "BREAKAWAY")
   dbIns("CLIENT_COMMANDS", command, con)
   shinyjs::disable("bet_for_breakaway")
@@ -78,30 +80,31 @@ observeEvent(input$bet_for_breakaway, {
 
 
 observe({
+
 req(input$join_tournament)
-
-  newest_game <- game_status_simple_current_game()[, max(GAME_ID)]
-  newest_game_turn <- game_status_simple_current_game()[GAME_ID == newest_game, max(TURN_ID)]
-  players_in_latest_game <- tournament_result$data[TOURNAMENT_NM == input$join_tournament & GAME_ID == newest_game, .N]
-  finished_players <- tournament_result$data[TOURNAMENT_NM == input$join_tournament & GAME_ID == newest_game & FINISH_TURN > 0, .N]
-  latest_game_finished <- players_in_latest_game == finished_players
-
-  if (latest_game_finished) {
-    #pevious game started, no new
-    shinyjs::enable("save_initial_grid")
-    shinyjs::disable("bet_for_breakaway")
-    shinyjs::disable("start_game")
-  } else if ( latest_game_finished == FALSE & newest_game_turn < 1) {
-    #start game pressend, but not continued
-    shinyjs::disable("save_initial_grid")
-  shinyjs::enable("bet_for_breakaway")
-  shinyjs::enable("start_game")
-} else {
-  #game on
-  shinyjs::disable("save_initial_grid")
-  shinyjs::disable("bet_for_breakaway")
-  shinyjs::disable("start_game")
-}
+  if (nrow(game_status_simple_current_game()) > 0) {
+        newest_game <- game_status_simple_current_game()[, max(GAME_ID)]
+        newest_game_turn <- game_status_simple_current_game()[GAME_ID == newest_game, max(TURN_ID)]
+        players_in_latest_game <- tournament_result$data[TOURNAMENT_NM == input$join_tournament & GAME_ID == newest_game, .N]
+        finished_players <- tournament_result$data[TOURNAMENT_NM == input$join_tournament & GAME_ID == newest_game & FINISH_TURN > 0, .N]
+        latest_game_finished <- players_in_latest_game == finished_players
+        if (latest_game_finished) {
+          #pevious game started, no new
+          shinyjs::enable("save_initial_grid")
+          shinyjs::disable("bet_for_breakaway")
+          shinyjs::disable("start_game")
+        } else if ( latest_game_finished == FALSE & newest_game_turn < 1) {
+          #start game pressend, but not continued
+          shinyjs::disable("save_initial_grid")
+        shinyjs::enable("bet_for_breakaway")
+        shinyjs::enable("start_game")
+      } else {
+        #game on
+        shinyjs::disable("save_initial_grid")
+        shinyjs::disable("bet_for_breakaway")
+        shinyjs::disable("start_game")
+      }
+  }
 })
 
 observeEvent(input$save_initial_grid, {
@@ -158,5 +161,13 @@ observeEvent(c(
 }, ignoreInit = TRUE)
 
 
+observeEvent(input$start_after_betting, {
+  #tell server we are ready and check that it has not been tol
+
+  command <- data.table(TOURNAMENT_NM = input$join_tournament, COMMAND = "BREAKAWAY_DONE")
+  dbIns("CLIENT_COMMANDS", command, con)
+  updateTabItems(session, "sidebarmenu", selected = "tab_manage_deck")
+
+})
 
 

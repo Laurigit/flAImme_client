@@ -110,7 +110,9 @@ played_card_status <- reactive({
   req(input$join_tournament)
     req( move_fact$data)
     req(player_reactive$team)
-  print("played_card_status_react")
+
+    if (nrow(game_status_simple_current_game()) > 0) {
+     print("played_card_status_react")
 
   #check if we are waiting for others to finish
   gid <- curr_game_id(input$join_tournament, con)
@@ -132,8 +134,7 @@ played_card_status <- reactive({
      status <- 4
    } else if (current_turn > 0 & first_cycler_selected == FALSE) {
     #I need to choose cycler
-     updateTabItems(session, "sidebarmenu", selected = "tab_game_status")
-     print("TAB CHANGED IN played card reactive")
+
      status <- 1
    }  else if (how_many_played == 0) {
      # i need to choose first card
@@ -142,14 +143,15 @@ played_card_status <- reactive({
        #i need to choose 2nd card
       status <- 3
      } else if (missing_total > 0) {
-       updateTabItems(session, "sidebarmenu", selected = "tab_human_input")
+
        tournament_result$data <- dbSelectAll("TOURNAMENT_RESULT", con)
        status <- 4
      } else {
        status <- 5
      }
-return(status)
 
+return(status)
+    }
 })
 
 observeEvent(played_card_status(), {
