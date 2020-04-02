@@ -24,8 +24,9 @@ tabItem(tabName = "tab_game_status",
                 plotOutput("game_map_scroll")
             )
           ),
-
+          fluidRow(
           uiOutput(outputId = "play_or_confirm")
+          )
 
 
 

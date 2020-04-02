@@ -144,7 +144,7 @@ played_card_status <- reactive({
       status <- 3
      } else if (missing_total > 0) {
 
-       tournament_result$data <- dbSelectAll("TOURNAMENT_RESULT", con)
+
        status <- 4
      } else {
        status <- 5

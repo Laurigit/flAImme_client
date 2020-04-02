@@ -33,7 +33,7 @@ output$game_map_scroll <- renderPlot({
   track <- tn_data[LANE == -1, max(TRACK_ID)]
 
   track_info <- create_track_ui_info(STG_TRACK, STG_TRACK_PIECE, track)
-  p2 <- create_track_status_map_scrollable(ADM_CYCLER_INFO, game_status(), track_info)
+  p2 <- create_track_status_map_scrollable(ADM_CYCLER_INFO, game_status(), track_info, player_reactive$team)
   p2
 })
 
@@ -48,22 +48,22 @@ output$select_which_cycler_plays_first <- renderUI({
   cyclers_left <- gs_data[TURN_ID == max_gs_turn & CYCLER_ID > 0, CYCLER_ID]
   my_options <- ADM_CYCLER_INFO[CYCLER_ID %in% cyclers_left & TEAM_ID == player_reactive$team, CYCLER_TYPE_NAME]
 
-  fluidRow(splitLayout(column(2, actionBttn(inputId = "back_to_stats3", label = "Stats", style = "material-flat", color = "default", size = "md", block = TRUE)),
-           column(5,
+splitLayout( actionBttn(inputId = "back_to_stats3", label = "Stats", style = "material-flat", color = "default", size = "md", block = TRUE),
+
                   actionBttn(inputId = "confim_first_played_cycler",
                              label = "Lock first cycler",
                              style = "material-flat",
                              color = "primary",
                              size = "md",
-                             block = TRUE)),
-           column(5, radioGroupButtons(inputId = "radio_first_cycler",
+                             block = TRUE),
+      radioGroupButtons(inputId = "radio_first_cycler",
                                        label = NULL,
                                        choices = my_options,
                                        selected = NULL,
                                        status = "info",
                                        direction = "horizontal",
-                                       size = "normal",
-                                       width = "100%"))))
+                                       size = "lg",
+                                       width = "100%"))
 })
 
 
@@ -159,21 +159,21 @@ output$select_played_card <- renderUI({
   my_type <- ADM_CYCLER_INFO[CYCLER_ID == moving_cycler, CYCLER_TYPE_NAME]
 
   card_options <- choices_input[CYCLER_ID == moving_cycler & Zone == "Hand", CARD_ID]
-  fluidRow(splitLayout(
-    column(2,actionBttn(inputId = "back_to_stats2", label = "Stats", style = "material-flat", color = "default", size = "lg", block = TRUE)),
-    column(2,
+ splitLayout(
+  actionBttn(inputId = "back_to_stats2", label = "Stats", style = "material-flat", color = "default", size = "md", block = FALSE),
+
            disabled(actionBttn(inputId = "confirm_selected_card", label = first_or_second,
-                               style = "material-flat", size = "lg", block = TRUE))
+                               style = "material-flat", size = "md", block = FALSE)
     ),
-    column(8, radioGroupButtons(inputId = "select_played_card",
-                                            label = paste0(my_type, ": select card"),
+     radioGroupButtons(inputId = "select_played_card",
+                                            label = NULL,
                                             selected = -1,
                                             status = "primary",
                                             size = "lg",
                                             direction = "horizontal",
                                             choices = card_options,
                                             width = "100%"
-    )))
+    )
   )
 
 })

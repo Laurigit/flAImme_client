@@ -41,7 +41,7 @@ create_track_status_map_FULL <- function(ADM_CYCLER_INFO, game_status) {
   p1 <- ggplot(filter_lanes,
                aes(x = LANE_graph, y = SLOT_Y_AXIS, fill = factor(color_id))) +
     #geom_tile(color = "gray", size = 5) +
-    geom_tile(aes( color=as.factor(pa_color_with_finish), width = 1, height = 0.5), size=0.75) +
+    geom_tile(aes( color=as.factor(pa_color_with_finish), width = 1, height = 0.8), size = 0.85) +
     geom_text(aes(label = SHORT_TYPE, color = as.factor(font_color)), size = 1) +
     scale_fill_manual(values=c("1" = "red",
                                "2" = "blue3",

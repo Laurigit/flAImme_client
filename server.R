@@ -20,7 +20,7 @@ shinyServer(function(input, output, session) {
                                     tournament = NULL,
                                     game = NULL)
 
-
+#  js$hidehead('none')
   reactive({
     move_to$tab
    # updateTabItems(session, "sidebarmenu", selected = "tab_bet_for_breakaway")
@@ -36,6 +36,8 @@ shinyServer(function(input, output, session) {
 
  deck_status_data <-  my_reactivePoll(session, "DECK_STATUS", paste0('SELECT sum(CYCLER_ID) FROM DECK_STATUS'), timeout = 1000, con)
 
+ tournament_data_reactive <- my_reactivePoll(session, "TOURNAMENT_RESULT", "SELECT * FROM TOURNAMENT_RESULT", 2000, con)
+
  deck_status_curr_game <- reactive({
 
    req(input$join_tournament)
@@ -48,6 +50,9 @@ shinyServer(function(input, output, session) {
     result
  })
 
+observe({
+  tournament_result$data <- tournament_data_reactive()
+})
 
 
  game_status <- reactive({

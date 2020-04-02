@@ -25,7 +25,7 @@ observeEvent(input$save_me, {
   #find my team id
   player_reactive$tournament <- input$join_tournament
   player_reactive$team <-   max(tournament$data[PLAYER_NM == input$my_name, TEAM_ID])
-
+  updateTabItems(session, "sidebarmenu", selected = "tab_game_status")
 })
 
 observeEvent(input$join_tournament, {
