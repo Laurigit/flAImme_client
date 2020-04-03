@@ -48,13 +48,14 @@ output$select_which_cycler_plays_first <- renderUI({
   cyclers_left <- gs_data[TURN_ID == max_gs_turn & CYCLER_ID > 0, CYCLER_ID]
   my_options <- ADM_CYCLER_INFO[CYCLER_ID %in% cyclers_left & TEAM_ID == player_reactive$team, CYCLER_TYPE_NAME]
 
-splitLayout( actionBttn(inputId = "back_to_stats3", label = "Stats", style = "material-flat", color = "default", size = "md", block = TRUE),
+splitLayout(cellWidths = c("20%", "40%", "40%"),
+            actionBttn(inputId = "back_to_stats3", label = "Stats", style = "material-flat", color = "default", size = "lg", block = TRUE),
 
                   actionBttn(inputId = "confim_first_played_cycler",
                              label = "Lock first cycler",
                              style = "material-flat",
                              color = "primary",
-                             size = "md",
+                             size = "lg",
                              block = TRUE),
       radioGroupButtons(inputId = "radio_first_cycler",
                                        label = NULL,
@@ -120,6 +121,30 @@ observeEvent(input$confim_first_played_cycler, {
   move_fact$data <- dbSelectAll("MOVE_FACT", con)[GAME_ID == player_reactive$game & TOURNAMENT_NM == input$join_tournament]
 })
 
+#obsever who has played
+output$db_text <- renderText({
+
+  req( game_status(), deck_status_curr_game())
+  #who are plyaing
+  playing <- game_status()[CYCLER_ID > 0, .(CYCLER_ID, PLAYING = TRUE)]
+  next_turn <- deck_status_curr_game()[, max(TURN_ID)]
+
+
+  gamedata <-   move_fact$data[GAME_ID == player_reactive$game]
+
+  #who has played
+  played <- gamedata[TURN_ID == next_turn & CARD_ID > -1, .(CYCLER_ID, PLAYED = TRUE)]
+  join_pp <- played[playing, on = "CYCLER_ID"][is.na(PLAYED)]
+  ss_team <- ADM_CYCLER_INFO[, .(CYCLER_ID, TEAM_COLOR)]
+  join_team <- ss_team[join_pp, on = "CYCLER_ID"]
+  missing_teams <- join_team[, .N, by = TEAM_COLOR][, TEAM_COLOR]
+
+ res <- paste0(missing_teams, collapse = " ")
+ res
+
+})
+
+
 output$play_or_confirm <- renderUI({
 req(played_card_status())
   shinyjs::disable("confirm_selected_card")
@@ -142,14 +167,22 @@ output$select_played_card <- renderUI({
   cycler_options <- move_fact$data[TOURNAMENT_NM == input$join_tournament &
                                      TEAM_ID == player_reactive$team & CARD_ID == -1]
 
+
+
   turni <- choices_input_all[, max (TURN_ID)]
   choices_input <- choices_input_all[TURN_ID == turni]
   if (played_card_status() == 2) {
     moving_cycler <- cycler_options[FIRST_SELECTED == 1, CYCLER_ID]
-    first_or_second <- "Play first"
+    my_cyc_type <- ADM_CYCLER_INFO[CYCLER_ID == moving_cycler, CYCLER_TYPE_NAME]
+    first_or_second <- paste0("Play ", my_cyc_type)
   } else if (played_card_status() == 3) {
     moving_cycler <- cycler_options[FIRST_SELECTED == 0, CYCLER_ID]
-    first_or_second <- "Play second"
+    #check what we played first
+    first_move <-  move_fact$data[TOURNAMENT_NM == input$join_tournament &
+                                    TEAM_ID == player_reactive$team & CARD_ID != -1 & TURN_ID == turni, CARD_ID]
+    my_cyc_type <- ADM_CYCLER_INFO[CYCLER_ID == moving_cycler, CYCLER_TYPE_NAME]
+
+    first_or_second <- paste0("Play ", my_cyc_type, " (", first_move, ")")
   }  else ({
     # move_to$tab <- "tab_game_status"
     #updateTabItems(session, "sidebarmenu", selected = "tab_game_status")
@@ -159,11 +192,11 @@ output$select_played_card <- renderUI({
   my_type <- ADM_CYCLER_INFO[CYCLER_ID == moving_cycler, CYCLER_TYPE_NAME]
 
   card_options <- choices_input[CYCLER_ID == moving_cycler & Zone == "Hand", CARD_ID]
- splitLayout(
-  actionBttn(inputId = "back_to_stats2", label = "Stats", style = "material-flat", color = "default", size = "md", block = FALSE),
+ splitLayout(cellWidths = c("20%", "40%", "40%"),
+  actionBttn(inputId = "back_to_stats2", label = "Stats", style = "material-flat", color = "default", size = "lg", block = FALSE),
 
            disabled(actionBttn(inputId = "confirm_selected_card", label = first_or_second,
-                               style = "material-flat", size = "md", block = FALSE)
+                               style = "material-flat", size = "lg", block = TRUE)
     ),
      radioGroupButtons(inputId = "select_played_card",
                                             label = NULL,

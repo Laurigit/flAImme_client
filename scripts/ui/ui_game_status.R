@@ -20,7 +20,7 @@ tabItem(tabName = "tab_game_status",
             #     plotOutput("game_map_scroll")
             # )
           splitLayout(plotOutput("game_map_full"),
-            div(style = 'height: 810px;, overflow-y: scroll',
+            div(style = 'height: calc(98vh - 100px);, overflow-y: scroll',
                 plotOutput("game_map_scroll")
             )
           ),

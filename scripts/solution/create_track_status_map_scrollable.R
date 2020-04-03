@@ -42,8 +42,11 @@ create_track_status_map_scrollable <- function(ADM_CYCLER_INFO, game_status, tra
 
   aggr_slot_coord <- track_info[, .N, by = .(GAME_SLOT_ID, SLOT_COORD)][, N := NULL]
 
-  first_visualized_slot <- filter_lanes[CYCLER_ID > 0, min(GAME_SLOT_ID)]
+   last_cycler_last <- filter_lanes[CYCLER_ID > 0, min(GAME_SLOT_ID)]
   last_visualized_slot <- filter_lanes[, max(GAME_SLOT_ID)] + 1
+  twenty_from_finish <- last_visualized_slot - 20
+  first_visualized_slot <- max(1, min(last_cycler_last, twenty_from_finish))
+
   labels <- c(aggr_slot_coord[GAME_SLOT_ID >= first_visualized_slot & GAME_SLOT_ID <= last_visualized_slot, SLOT_COORD])
   input_breaks <- c(rep((first_visualized_slot):(last_visualized_slot - 1)))
 

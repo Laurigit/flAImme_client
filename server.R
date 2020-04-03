@@ -11,7 +11,7 @@ move_to <- reactiveValues(tab = "")
 
 update_breakaway_bet <- reactiveValues(data = 0)
 
-
+move_fact <- reactiveValues(data = NULL)
 
 shinyServer(function(input, output, session) {
   con <- connDB(con, "flaimme")

@@ -21,7 +21,7 @@ output$players <-  renderDataTable({
   sscols_coords <- coords[, .(CYCLER_ID, COORD)]
   sscols_coords
 
-  cycler_names <-tournament$data[,. (TEAM_ID, PLAYER_NM)]
+  cycler_names <- tournament$data[,. (TEAM_ID, PLAYER_NM)]
 
   join_info <- ADM_CYCLER_INFO[sscols_coords, on = "CYCLER_ID"]
   join_names <- cycler_names[join_info, on = "TEAM_ID"]
@@ -104,7 +104,7 @@ observeEvent(input$confirm_selected_card, {
 
 
 con <- connDB(con, "flaimme")
-move_fact <- reactiveValues(data = NULL)
+
 
 played_card_status <- reactive({
   req(input$join_tournament)
@@ -220,7 +220,12 @@ output$other_decks <- DT::renderDataTable({
   resdata <- create_comp_deck_status(choices_input, player_reactive$team, ADM_CYCLER_INFO)
   resdt <- datatable(resdata,  rownames = FALSE, options = list(info = FALSE,
                                                                                       paging = FALSE,
-                                                                                      dom = 't',ordering = F))
+                                                                                      dom = 't',ordering = F)) %>% formatStyle(
+                                                                                        colnames(resdata)[3:ncol(resdata)],
+                                                                                        target = 'cell',
+                                                                                        backgroundColor = styleEqual(c(1, 2, 3, 0), c("orange", "yellow", "green", "red")
+                                                                                        )
+                                                                                      )
  }
 })
 

@@ -8,8 +8,8 @@ uusi_peli <- dashboardBody(
 
   useShinyjs(),
  # tags$style(type = "text/css", "#game_map_full {height: calc(98vh - 130px) !important;}"),
- tags$style(type = "text/css", "#game_map_full {height: 810px !important;}"),
-  tags$style(type = "text/css", "#game_map_scroll {height: calc(400vh - 80px) !important;}"),
+ tags$style(type = "text/css", "#game_map_full {height: calc(98vh - 100px) !important;}"),
+  tags$style(type = "text/css", "#game_map_scroll {height:4500px !important;}"),
   tags$script("$(\"input:radio[name='blue_setup'][value='Human']\").parent().css('background-color', '#DE6B63');"),
  extendShinyjs(text = "shinyjs.hidehead = function(parm){
                                     $('header').css('display', parm);
@@ -102,7 +102,7 @@ dashboardPage( title = "flAImme Rouge",
                #  dashboardHeader(title = textOutput('blow_timer'),
                #                 titleWidth = 450),
 
-               dashboardHeader(title = textOutput('Username')),
+               dashboardHeader(title = textOutput('db_text')),
 
                sidebar,
                uusi_peli
