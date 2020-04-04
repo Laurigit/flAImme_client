@@ -12,7 +12,7 @@ output$game_map_full <- renderPlot({
 req( game_status())
 
 
-p1 <- create_track_status_map_FULL(ADM_CYCLER_INFO, game_status())
+p1 <- create_track_status_map_FULL(ADM_CYCLER_INFO, game_status(), team_id)
 
   # my_cycler <- ADM_CYCLER_INFO[TEAM_ID == player_reactive$team & CYCLER_TYPE_NAME == "Sprinteur", CYCLER_ID]
   #
@@ -168,9 +168,9 @@ req(played_card_status())
 
 output$select_played_card <- renderUI({
 
-  choices_input_all <- deck_status_data()[TOURNAMENT_NM == input$join_tournament & GAME_ID ==  player_reactive$game ]
-  cycler_options <- move_fact$data[TOURNAMENT_NM == input$join_tournament &
-                                     TEAM_ID == player_reactive$team & CARD_ID == -1]
+  choices_input_all <- isolate(deck_status_data()[TOURNAMENT_NM == input$join_tournament & GAME_ID ==  player_reactive$game ])
+  cycler_options <- isolate(move_fact$data[TOURNAMENT_NM == input$join_tournament &
+                                     TEAM_ID == player_reactive$team & CARD_ID == -1])
 
 
 

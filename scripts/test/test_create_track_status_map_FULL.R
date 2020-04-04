@@ -1,4 +1,9 @@
-create_track_status_map_FULL <- function(ADM_CYCLER_INFO, game_status) {
+
+game_status <- create_track_table(1, STG_TRACK_PIECE, STG_TRACK, NULL)
+
+game_status[10, CYCLER_ID := 1]
+game_status[22, CYCLER_ID := 2]
+team_id <- 1
 
   finish_slot <- game_status[FINISH == 1, max(GAME_SLOT_ID)]
   max_lanes <- game_status[GAME_SLOT_ID <= finish_slot, max(LANE_NO)]
@@ -79,7 +84,7 @@ create_track_status_map_FULL <- function(ADM_CYCLER_INFO, game_status) {
     theme(axis.title.x=element_blank(),
           axis.title.y=element_blank(),
           axis.text.x = element_blank(),
-          # axis.text.y = element_blank(),
+         # axis.text.y = element_blank(),
           axis.ticks.y=element_blank(),
           axis.ticks.x=element_blank(),
           legend.position = "none",
@@ -89,6 +94,4 @@ create_track_status_map_FULL <- function(ADM_CYCLER_INFO, game_status) {
 
     scale_y_continuous(limits = c(0, last_visualized_slot), expand = c(0, 0), breaks = c(0.15 + rep(1:last_visualized_slot)),
                        label = rouler_label_text, sec.axis = sec_axis(~ . + 0, label = sprint_label_text, breaks = 0.2 + rep(1:last_visualized_slot)))
-
-  return(p1)
-}
+  p1
