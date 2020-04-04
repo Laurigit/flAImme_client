@@ -58,9 +58,9 @@ output$players <-  renderDataTable({
     join_acts <- prev_actions_turn[join_ex_to_names, on = "CYCLER_ID"]
     join_move <-joinaa[join_acts, on = "CYCLER_ID"]
 
-    sscols_info <- join_move[order(CYCLER_ID)][, .(Player = PLAYER_NM, Team = TEAM_COLOR, Rider = SHORT_TYPE, Position = COORD, Played = CARD_PLAYED,
-                                                   Moves = MOVEMENT_GAINED,
-                                                   Exhaust = EX_GAINED
+    sscols_info <- join_move[order(CYCLER_ID)][, .(Team = TEAM_COLOR, S_R = SHORT_TYPE, Pos = COORD, Card = CARD_PLAYED,
+                                                   Move = MOVEMENT_GAINED,
+                                                   Exh = EX_GAINED
     )]
 
     datatable(sscols_info,  rownames = FALSE, options = list(info = FALSE, paging = FALSE, dom = 't',ordering = F)) %>% formatStyle(

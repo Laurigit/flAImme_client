@@ -49,13 +49,13 @@ output$select_which_cycler_plays_first <- renderUI({
   my_options <- ADM_CYCLER_INFO[CYCLER_ID %in% cyclers_left & TEAM_ID == player_reactive$team, CYCLER_TYPE_NAME]
 
 splitLayout(cellWidths = c("20%", "40%", "40%"),
-            actionBttn(inputId = "back_to_stats3", label = "Stats", style = "material-flat", color = "default", size = "lg", block = TRUE),
+            actionBttn(inputId = "back_to_stats3", label = "Stats", style = "material-flat", color = "default", size = "md", block = TRUE),
 
                   actionBttn(inputId = "confim_first_played_cycler",
                              label = "Lock first cycler",
                              style = "material-flat",
                              color = "primary",
-                             size = "lg",
+                             size = "md",
                              block = TRUE),
       radioGroupButtons(inputId = "radio_first_cycler",
                                        label = NULL,
@@ -63,7 +63,7 @@ splitLayout(cellWidths = c("20%", "40%", "40%"),
                                        selected = NULL,
                                        status = "info",
                                        direction = "horizontal",
-                                       size = "lg",
+                                       size = "normal",
                                        width = "100%"))
 })
 
@@ -124,7 +124,9 @@ observeEvent(input$confim_first_played_cycler, {
 #obsever who has played
 output$db_text <- renderText({
 
-  req( game_status(), deck_status_curr_game())
+  req( game_status(), deck_status_curr_game(), input$join_tournament)
+  moves_made <- move_fact$data[, .N]
+  if (moves_made > 0 ) {
   #who are plyaing
   playing <- game_status()[CYCLER_ID > 0, .(CYCLER_ID, PLAYING = TRUE)]
   next_turn <- deck_status_curr_game()[, max(TURN_ID)]
@@ -141,7 +143,10 @@ output$db_text <- renderText({
 
  res <- paste0(missing_teams, collapse = " ")
  res
-
+  } else {
+    res <- ""
+    res
+  }
 })
 
 
@@ -193,16 +198,16 @@ output$select_played_card <- renderUI({
 
   card_options <- choices_input[CYCLER_ID == moving_cycler & Zone == "Hand", CARD_ID]
  splitLayout(cellWidths = c("20%", "40%", "40%"),
-  actionBttn(inputId = "back_to_stats2", label = "Stats", style = "material-flat", color = "default", size = "lg", block = FALSE),
+  actionBttn(inputId = "back_to_stats2", label = "Stats", style = "material-flat", color = "default", size = "md", block = FALSE),
 
            disabled(actionBttn(inputId = "confirm_selected_card", label = first_or_second,
-                               style = "material-flat", size = "lg", block = TRUE)
+                               style = "material-flat", size = "md", block = TRUE)
     ),
      radioGroupButtons(inputId = "select_played_card",
                                             label = NULL,
                                             selected = -1,
                                             status = "primary",
-                                            size = "lg",
+                                            size = "normal",
                                             direction = "horizontal",
                                             choices = card_options,
                                             width = "100%"
@@ -213,7 +218,7 @@ output$select_played_card <- renderUI({
 
 output$show_only_stats_button <- renderUI({
   fluidRow(
-  actionBttn(inputId = "back_to_stats", label = "Stats", style = "material-flat", color = "default", size = "lg", block = TRUE)
+  actionBttn(inputId = "back_to_stats", label = "Stats", style = "material-flat", color = "default", size = "md", block = TRUE)
   )
 })
 

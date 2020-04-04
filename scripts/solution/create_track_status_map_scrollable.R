@@ -85,7 +85,7 @@ create_track_status_map_scrollable <- function(ADM_CYCLER_INFO, game_status, tra
           axis.text.x = element_blank(),
           axis.ticks.x=element_blank(),
           axis.ticks.y = element_blank(),
-          axis.text.y = element_text(size=20, hjust = 1) ,
+          axis.text.y = element_text(size = 20, hjust = 1) ,
        #   axis.text.y = element_text(size = 10, hjust = -5),
           legend.position = "none",
           panel.background = element_rect(fill = "white", colour = "white", size = 0.5)

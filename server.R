@@ -20,12 +20,24 @@ shinyServer(function(input, output, session) {
                                     tournament = NULL,
                                     game = NULL)
 
-#  js$hidehead('none')
-  reactive({
-    move_to$tab
-   # updateTabItems(session, "sidebarmenu", selected = "tab_bet_for_breakaway")
 
-  })
+#observe if dashboard top should be hidden
+observe({
+  req(input$join_tournament)
+  #no games with SLOTS_OVER_FINISH < 0, then show all menus
+
+  unfinished_cyclers <- tournament_result$data[SLOTS_OVER_FINISH < 0, .N]
+  if (unfinished_cyclers == 0 ) {
+    js$hidehead('')
+    shinyjs::removeClass(selector = "body", class = "sidebar-collapse")
+
+  } else {
+    shinyjs::addClass(selector = "body", class = "sidebar-collapse")
+    js$hidehead('none')
+  }
+#corona
+})
+#
 
 
   #try to read status of breakaway bets
