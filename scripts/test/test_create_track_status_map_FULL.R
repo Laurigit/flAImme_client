@@ -1,9 +1,7 @@
 
-game_status <- create_track_table(1, STG_TRACK_PIECE, STG_TRACK, NULL)
+game_status <- create_track_table(1, STG_TRACK_PIECE, STG_TRACK, NULL, team_id)
 
-game_status[10, CYCLER_ID := 1]
-game_status[22, CYCLER_ID := 2]
-team_id <- 1
+
 
   finish_slot <- game_status[FINISH == 1, max(GAME_SLOT_ID)]
   max_lanes <- game_status[GAME_SLOT_ID <= finish_slot, max(LANE_NO)]

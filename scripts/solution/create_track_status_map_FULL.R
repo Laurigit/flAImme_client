@@ -1,4 +1,4 @@
-create_track_status_map_FULL <- function(ADM_CYCLER_INFO, game_status) {
+create_track_status_map_FULL <- function(ADM_CYCLER_INFO, game_status, team_id) {
 
   finish_slot <- game_status[FINISH == 1, max(GAME_SLOT_ID)]
   max_lanes <- game_status[GAME_SLOT_ID <= finish_slot, max(LANE_NO)]

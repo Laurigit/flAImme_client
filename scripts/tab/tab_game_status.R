@@ -11,8 +11,7 @@ output$game_map_full <- renderPlot({
 
 req( game_status())
 
-
-p1 <- create_track_status_map_FULL(ADM_CYCLER_INFO, game_status(), team_id)
+  p1 <- create_track_status_map_FULL(ADM_CYCLER_INFO, game_status(), player_reactive$team)
 
   # my_cycler <- ADM_CYCLER_INFO[TEAM_ID == player_reactive$team & CYCLER_TYPE_NAME == "Sprinteur", CYCLER_ID]
   #
