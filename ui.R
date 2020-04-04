@@ -102,7 +102,7 @@ dashboardPage( title = "flAImme Rouge",
                #  dashboardHeader(title = textOutput('blow_timer'),
                #                 titleWidth = 450),
 
-               dashboardHeader(title = textOutput('db_text')),
+               dashboardHeader(title = "game setup"),
 
                sidebar,
                uusi_peli

@@ -161,7 +161,8 @@ req(played_card_status())
     uiOutput(outputId = "select_played_card")
   } else {
     #browser()
-    actionBttn(inputId = "back_to_stats1", label = "Stats", style = "material-flat", color = "default", size = "lg", block = TRUE)
+    splitLayout(cellWidths = c("30%", "70%"),actionBttn(inputId = "back_to_stats1", label = "Stats", style = "material-flat", color = "default", size = "md", block = TRUE),
+                h4(textOutput("db_text")))
   }
 })
 

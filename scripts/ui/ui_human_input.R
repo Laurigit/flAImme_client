@@ -1,6 +1,6 @@
 tabItem(tabName = "tab_human_input",
         fluidPage(
-          fluidRow( DT::dataTableOutput(outputId = "players")),
+          fluidRow(div(DT::dataTableOutput(outputId = "players")), style = "50%"),
           fluidRow(splitLayout(div(DT::dataTableOutput(outputId = "sprinter_deck"), style = "font-size: 100%; width: 55%"),
                     div(DT::dataTableOutput(outputId = "rouler_deck"), style = "font-size: 100%; width: 55%"))),
           fluidRow(DT::dataTableOutput("other_decks")),

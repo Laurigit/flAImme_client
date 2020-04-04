@@ -58,17 +58,20 @@ output$players <-  renderDataTable({
     join_acts <- prev_actions_turn[join_ex_to_names, on = "CYCLER_ID"]
     join_move <-joinaa[join_acts, on = "CYCLER_ID"]
 
-    sscols_info <- join_move[order(CYCLER_ID)][, .(Team = TEAM_COLOR, S_R = SHORT_TYPE, Pos = COORD, Card = CARD_PLAYED,
-                                                   Move = MOVEMENT_GAINED,
-                                                   Exh = EX_GAINED
+    sscols_info <- join_move[order(CYCLER_ID)][, .(C = paste0(str_sub(TEAM_COLOR, 1, 2),SHORT_TYPE), Pos = COORD, Crd = CARD_PLAYED,
+                                                   Mv = MOVEMENT_GAINED,
+                                                   Ex = EX_GAINED
     )]
 
-    datatable(sscols_info,  rownames = FALSE, options = list(info = FALSE, paging = FALSE, dom = 't',ordering = F)) %>% formatStyle(
-      'Team',
+    datatable(sscols_info,  rownames = FALSE, options = list( autoWidth = TRUE,
+                                                              columnDefs = list(list(width = '10px', targets = "_all")),
+                                                              info = FALSE,
+                                                              paging = FALSE, dom = 't',ordering = F)) %>% formatStyle(
+      'C',
       target = 'row',
-      color = styleEqual(c("Red", "Blue", "Green", "Black", "White", "Purple"), c("white", "white", "white", "white", "black", "black")),
-      backgroundColor = styleEqual(c("Red", "Blue", "Green", "Black", "White", "Purple"), c('red', 'blue', 'green', 'black', 'white', 'pink'))
-    )
+      color = styleEqual(c("ReR", "BlR", "GrR", "BlR", "WhR", "PuR", "ReS", "BlS", "GrS", "BlS", "WhS", "PuS"), c("white", "white", "white", "white", "black", "black", "white", "white", "white", "white", "black", "black")),
+      backgroundColor = styleEqual(c("ReR", "BlR", "GrR", "BlR", "WhR", "PuR", "ReS", "BlS", "GrS", "BlS", "WhS", "PuS"), c('red', 'blue', 'green', 'black', 'white', 'pink', 'red', 'blue', 'green', 'black', 'white', 'pink'))
+    ) %>% formatStyle(columns = c(1,2,3,4,5), width='1px')
   }
 })
 observeEvent(input$select_played_card, {
@@ -183,7 +186,7 @@ output$rouler_deck <- DT::renderDataTable({
   choices_input <- choices_input_all[TURN_ID == (turni - 1) & HAND_OPTIONS == 0]
   cycler_input <- ADM_CYCLER_INFO[CYCLER_TYPE_NAME == "Rouler" & TEAM_ID == player_reactive$team, CYCLER_ID]
   resdata <- create_deck_stats(choices_input, cycler_input)
-  resdt <- datatable(resdata,  caption = "Rouleur",  rownames = FALSE, options = list(info = FALSE,
+  resdt <- datatable(resdata,  caption = "Rouler",  rownames = FALSE, options = list(info = FALSE,
                                                                                       autoWidth = TRUE,
                                                                                       columnDefs = list(list(width = '10px', targets = "_all")),
                                                                                       paging = FALSE, dom = 't',ordering = F))
@@ -221,11 +224,17 @@ output$other_decks <- DT::renderDataTable({
   resdt <- datatable(resdata,  rownames = FALSE, options = list(info = FALSE,
                                                                                       paging = FALSE,
                                                                                       dom = 't',ordering = F)) %>% formatStyle(
-                                                                                        colnames(resdata)[3:ncol(resdata)],
+                                                                                        colnames(resdata)[2:ncol(resdata)],
                                                                                         target = 'cell',
+                                                                                        color = "black",
                                                                                         backgroundColor = styleEqual(c(1, 2, 3, 0), c("orange", "yellow", "green", "red")
                                                                                         )
-                                                                                      )
+                                                                                      ) %>% formatStyle(columns = c(1,2,3,4,5), width='1px') %>% formatStyle(
+    'C',
+    target = 'row',
+    color = styleEqual(c("ReR", "BlR", "GrR", "BlR", "WhR", "PuR", "ReS", "BlS", "GrS", "BlS", "WhS", "PuS"), c("white", "white", "white", "white", "black", "black", "white", "white", "white", "white", "black", "black")),
+    backgroundColor = styleEqual(c("ReR", "BlR", "GrR", "BlR", "WhR", "PuR", "ReS", "BlS", "GrS", "BlS", "WhS", "PuS"), c('red', 'blue', 'green', 'black', 'white', 'pink', 'red', 'blue', 'green', 'black', 'white', 'pink'))
+  )
  }
 })
 
