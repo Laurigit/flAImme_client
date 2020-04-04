@@ -63,8 +63,8 @@ output$players <-  renderDataTable({
                                                    Ex = EX_GAINED
     )]
 
-    datatable(sscols_info,  rownames = FALSE, options = list( autoWidth = TRUE,
-                                                              columnDefs = list(list(width = '10px', targets = "_all")),
+    datatable(sscols_info,  rownames = FALSE, options = list(scrollX = TRUE, autoWidth = FALSE,
+                                                              columnDefs = list(list(width = '1px', targets = "_all")),
                                                               info = FALSE,
                                                               paging = FALSE, dom = 't',ordering = F)) %>% formatStyle(
       'C',
@@ -221,7 +221,7 @@ output$other_decks <- DT::renderDataTable({
    choices_input <- choices_input_all[TURN_ID == (turni - 1) & HAND_OPTIONS == 0]
 
   resdata <- create_comp_deck_status(choices_input, player_reactive$team, ADM_CYCLER_INFO)
-  resdt <- datatable(resdata,  rownames = FALSE, options = list(info = FALSE,
+  resdt <- datatable(resdata,  rownames = FALSE, options = list(scrollX=TRUE , info = FALSE,
                                                                                       paging = FALSE,
                                                                                       dom = 't',ordering = F)) %>% formatStyle(
                                                                                         colnames(resdata)[2:ncol(resdata)],
@@ -229,12 +229,13 @@ output$other_decks <- DT::renderDataTable({
                                                                                         color = "black",
                                                                                         backgroundColor = styleEqual(c(1, 2, 3, 0), c("orange", "yellow", "green", "red")
                                                                                         )
-                                                                                      ) %>% formatStyle(columns = c(1,2,3,4,5), width='1px') %>% formatStyle(
+                                                                                      ) %>% formatStyle(columns = c(1,2,3,4,5,6,7,8,9), width='1px') %>% formatStyle(
     'C',
     target = 'row',
     color = styleEqual(c("ReR", "BlR", "GrR", "BlR", "WhR", "PuR", "ReS", "BlS", "GrS", "BlS", "WhS", "PuS"), c("white", "white", "white", "white", "black", "black", "white", "white", "white", "white", "black", "black")),
     backgroundColor = styleEqual(c("ReR", "BlR", "GrR", "BlR", "WhR", "PuR", "ReS", "BlS", "GrS", "BlS", "WhS", "PuS"), c('red', 'blue', 'green', 'black', 'white', 'pink', 'red', 'blue', 'green', 'black', 'white', 'pink'))
-  )
+  )#%>%DT::formatStyle(columns = c(1,2,3,4,5,6,7,8,9), fontSize = '50%')
+
  }
 })
 
