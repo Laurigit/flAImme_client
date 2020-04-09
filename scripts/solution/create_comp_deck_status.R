@@ -9,9 +9,9 @@ create_comp_deck_status <- function(deck_status, team_id, ADM_CYCLER_INFO) {
   appendaa <- rbind(joinaa, dummy_row, fill = TRUE)
   #yritit laittaa kaikki sarakkaeet näkyviin, vaikak korteteja ei ois.
 
-  appendaa[, C := paste0(str_sub(TEAM_COLOR, 1, 2), SHORT_TYPE)]
+  appendaa[, C := paste0(str_sub(TEAM_COLOR, 1, 3), SHORT_TYPE)]
  casti <- dcast.data.table(appendaa, formula = C ~ comb_id, value.var = "N", fun.aggregate = sum, fill = 0)
- dummy_off <- casti[C != "nodelme"]
+ dummy_off <- casti[C != "nopdelme"]
 
  #setnames(casti, c("TEAM_COLOR", "SHORT_TYPE"), c("Team", "S_R"))
 

@@ -58,7 +58,7 @@ output$players <-  renderDataTable({
     join_acts <- prev_actions_turn[join_ex_to_names, on = "CYCLER_ID"]
     join_move <-joinaa[join_acts, on = "CYCLER_ID"]
 
-    sscols_info <- join_move[order(CYCLER_ID)][, .(C = paste0(str_sub(TEAM_COLOR, 1, 2),SHORT_TYPE), Pos = COORD, Crd = CARD_PLAYED,
+    sscols_info <- join_move[order(CYCLER_ID)][, .(C = paste0(str_sub(TEAM_COLOR, 1, 3),SHORT_TYPE), Pos = COORD, Crd = CARD_PLAYED,
                                                    Mv = MOVEMENT_GAINED,
                                                    Ex = EX_GAINED
     )]
@@ -69,8 +69,8 @@ output$players <-  renderDataTable({
                                                               paging = FALSE, dom = 't',ordering = F)) %>% formatStyle(
       'C',
       target = 'row',
-      color = styleEqual(c("ReR", "BlR", "GrR", "BlR", "WhR", "PuR", "ReS", "BlS", "GrS", "BlS", "WhS", "PuS"), c("white", "white", "white", "white", "black", "black", "white", "white", "white", "white", "black", "black")),
-      backgroundColor = styleEqual(c("ReR", "BlR", "GrR", "BlR", "WhR", "PuR", "ReS", "BlS", "GrS", "BlS", "WhS", "PuS"), c('red', 'blue', 'green', 'black', 'white', 'pink', 'red', 'blue', 'green', 'black', 'white', 'pink'))
+      color = styleEqual(c("RedR", "BluR", "GreR", "BlaR", "WhiR", "PurR", "RedS", "BluS", "GreS", "BlaS", "WhiS", "PurS"), c("white", "white", "white", "white", "black", "black", "white", "white", "white", "white", "black", "black")),
+      backgroundColor = styleEqual(c("RedR", "BluR", "GreR", "BlaR", "WhiR", "PurR", "RedS", "BluS", "GreS", "BlaS", "WhiS", "PurS"), c('red', 'blue', 'green', 'black', 'white', 'pink', 'red', 'blue', 'green', 'black', 'white', 'pink'))
     ) %>% formatStyle(columns = c(1,2,3,4,5), width='1px')
   }
 })
@@ -232,8 +232,8 @@ output$other_decks <- DT::renderDataTable({
                                                                                       ) %>% formatStyle(columns = c(1,2,3,4,5,6,7,8,9), width='1px') %>% formatStyle(
     'C',
     target = 'row',
-    color = styleEqual(c("ReR", "BlR", "GrR", "BlR", "WhR", "PuR", "ReS", "BlS", "GrS", "BlS", "WhS", "PuS"), c("white", "white", "white", "white", "black", "black", "white", "white", "white", "white", "black", "black")),
-    backgroundColor = styleEqual(c("ReR", "BlR", "GrR", "BlR", "WhR", "PuR", "ReS", "BlS", "GrS", "BlS", "WhS", "PuS"), c('red', 'blue', 'green', 'black', 'white', 'pink', 'red', 'blue', 'green', 'black', 'white', 'pink'))
+    color = styleEqual(c("RedR", "BluR", "GreR", "BlaR", "WhiR", "PurR", "RedS", "BluS", "GreS", "BlaS", "WhiS", "PurS"), c("white", "white", "white", "white", "black", "black", "white", "white", "white", "white", "black", "black")),
+    backgroundColor = styleEqual(c("RedR", "BluR", "GreR", "BlaR", "WhiR", "PurR", "RedS", "BluS", "GreS", "BlaS", "WhiS", "PurS"), c('red', 'blue', 'green', 'black', 'white', 'pink', 'red', 'blue', 'green', 'black', 'white', 'pink'))
   )#%>%DT::formatStyle(columns = c(1,2,3,4,5,6,7,8,9), fontSize = '50%')
 
  }
