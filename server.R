@@ -27,7 +27,9 @@ observe({
   #no games with SLOTS_OVER_FINISH < 0, then show all menus
 
   unfinished_cyclers <- tournament_result$data[SLOTS_OVER_FINISH < 0, .N]
-  if (unfinished_cyclers == 0 ) {
+
+  ba_kesken <- breakaway_cards()[, .(TOURNAMENT_NM)]
+  if (unfinished_cyclers == 0 | nrow(ba_kesken) > 0) {
     js$hidehead('')
     shinyjs::removeClass(selector = "body", class = "sidebar-collapse")
 
