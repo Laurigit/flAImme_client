@@ -46,7 +46,9 @@ output$show_tour_cylers <- DT::renderDataTable({
                           TIME = sum(TIME)),
                           by = CYCLER_ID
                           ]
-  attr_stats_cycler
+  min_time <- attr_stats_cycler[, min(TIME)]
+  attr_stats_cycler[, TIME := TIME - min_time]
+  setorder(attr_stats_cycler, TIME)
   attr_stats_cycler[, nice_time := paste0("+", seconds_to_period(TIME))]
 
   cyc_info <- ADM_CYCLER_INFO[,. (CYCLER_ID, TEAM_ID, CYCLER_TYPE_NAME)]

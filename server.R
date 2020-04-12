@@ -64,8 +64,12 @@ observe({
     result
  })
 
+
+
+
 observe({
   tournament_result$data <- tournament_data_reactive()
+  player_reactive$game <-  tournament_result$data[, max(GAME_ID)]
 })
 
 

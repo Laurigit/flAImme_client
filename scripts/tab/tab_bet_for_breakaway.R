@@ -33,9 +33,11 @@ req(player_reactive$team)
   input$join_tournament
   input$save_betted_card
   #########
-  who_is_betting <-   breakaway_bets_data()[TEAM_ID == player_reactive$team]
+  player_reactive$game <- tournament_result$data[, max(GAME_ID)]
+  who_is_betting <-   breakaway_bets_data()[TEAM_ID == player_reactive$team & GAME_ID == player_reactive$game]
   #check if we have a better
   bet_phase <- 0
+
   if (nrow(who_is_betting) > 0) {
     bet_phase <- 1
     my_cycler <- who_is_betting[TEAM_ID == player_reactive$team, CYCLER_ID]
@@ -106,7 +108,8 @@ observe({
   #have I announce who is particitipating?
   card_choises <- c(0, 0)
   ui_control$done <- FALSE
-  if (betting_phase() == 0) {
+
+    if (betting_phase() == 0) {
     ui_control$cards <- FALSE
     ui_control$confirm <- FALSE
     ui_control$table <- FALSE
@@ -169,7 +172,7 @@ observe({
 
 observeEvent(input$confirm_better, {
   #tell server who is betting
-browser()
+
   con <- connDB(con, "flaimme")
 
   find_cycler_id <- ADM_CYCLER_INFO[TEAM_ID ==  player_reactive$team & CYCLER_TYPE_ID == input$which_cycler_to_bet, CYCLER_ID]
