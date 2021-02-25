@@ -13,7 +13,7 @@ uusi_peli <- dashboardBody(
   tags$script("$(\"input:radio[name='blue_setup'][value='Human']\").parent().css('background-color', '#DE6B63');"),
  extendShinyjs(text = "shinyjs.hidehead = function(parm){
                                     $('header').css('display', parm);
-                                }"),
+                                }", functions = c("hidehead")),
  tags$script(
    '
     Shiny.addCustomMessageHandler("scrollCallback",
