@@ -16,6 +16,7 @@ output$show_race_stats <- DT::renderDataTable({
   req(input$select_race)
   tn_data <- tournament_result$data[TOURNAMENT_NM == input$join_tournament]
   stats <- create_finish_stats(tn_data)
+
   stats[, nice_time := paste0("+", seconds_to_period(TIME))]
   sel_race <- stats[GAME_ID == input$select_race, .(CYCLER_ID, POINTS, TIME = nice_time)]
   cyc_info <- ADM_CYCLER_INFO[,. (CYCLER_ID, TEAM_ID, CYCLER_TYPE_NAME)]
