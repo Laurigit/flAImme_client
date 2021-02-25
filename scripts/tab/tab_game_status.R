@@ -40,12 +40,12 @@ output$game_map_scroll <- renderPlot({
 output$select_which_cycler_plays_first <- renderUI({
 
   #check which cyclers I have left
-  gs_data <- game_status_simple_current_game()
+  gs_data <- isolate(game_status_simple_current_game())
   max_gs_turn <- gs_data[, max(TURN_ID)]
 
 
   cyclers_left <- gs_data[TURN_ID == max_gs_turn & CYCLER_ID > 0, CYCLER_ID]
-  my_options <- ADM_CYCLER_INFO[CYCLER_ID %in% cyclers_left & TEAM_ID == player_reactive$team, CYCLER_TYPE_NAME]
+  my_options <- isolate(ADM_CYCLER_INFO[CYCLER_ID %in% cyclers_left & TEAM_ID == player_reactive$team, CYCLER_TYPE_NAME])
 
 splitLayout(cellWidths = c("20%", "40%", "40%"),
             actionBttn(inputId = "back_to_stats3", label = "Stats", style = "material-flat", color = "default", size = "md", block = TRUE),
@@ -59,7 +59,7 @@ splitLayout(cellWidths = c("20%", "40%", "40%"),
       radioGroupButtons(inputId = "radio_first_cycler",
                                        label = NULL,
                                        choices = my_options,
-                                       selected = NULL,
+                                       selected = -1,
                                        status = "info",
                                        direction = "horizontal",
                                        size = "normal",
@@ -70,6 +70,8 @@ splitLayout(cellWidths = c("20%", "40%", "40%"),
 
 
 observeEvent(input$confim_first_played_cycler, {
+
+  if(!is.null(input$radio_first_cycler)) {
   selected_cycler <- ADM_CYCLER_INFO[CYCLER_TYPE_NAME == input$radio_first_cycler & TEAM_ID == player_reactive$team, CYCLER_ID]
 
 
@@ -118,6 +120,7 @@ observeEvent(input$confim_first_played_cycler, {
   con <- connDB(con, "flaimme")
   dbWriteTable(con, "MOVE_FACT", appendaa, row.names = FALSE, append = TRUE)
   move_fact$data <- dbSelectAll("MOVE_FACT", con)[GAME_ID == player_reactive$game & TOURNAMENT_NM == input$join_tournament]
+  }
 })
 
 #obsever who has played
