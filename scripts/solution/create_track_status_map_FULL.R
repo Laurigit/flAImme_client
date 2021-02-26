@@ -10,7 +10,7 @@ create_track_status_map_FULL <- function(ADM_CYCLER_INFO, game_status, team_id) 
   }
 
   cycler_pos <- game_status[, .(LANE_graph = 4- LANE_NO - lane_intend, GAME_SLOT_ID, PIECE_ATTRIBUTE, CYCLER_ID, LANE_NO)]
-  #browser()
+
 
   cyc_type <- ADM_CYCLER_INFO[, .(SHORT_TYPE, CYCLER_ID)]
   joinaa <- cyc_type[cycler_pos, on = "CYCLER_ID"]

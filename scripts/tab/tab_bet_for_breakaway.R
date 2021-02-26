@@ -169,7 +169,7 @@ observe({
 
 observeEvent(input$confirm_better, {
   #tell server who is betting
-browser()
+
   con <- connDB(con, "flaimme")
 
   find_cycler_id <- ADM_CYCLER_INFO[TEAM_ID ==  player_reactive$team & CYCLER_TYPE_ID == input$which_cycler_to_bet, CYCLER_ID]
