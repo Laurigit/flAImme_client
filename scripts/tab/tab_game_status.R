@@ -80,6 +80,8 @@ observeEvent(input$confim_first_played_cycler, {
 
   cyclers_left <- gs_data[TURN_ID == max_gs_turn & CYCLER_ID > 0, CYCLER_ID]
 
+  if (selected_cycler %in% cyclers_left) {
+
 
   my_options <- ADM_CYCLER_INFO[CYCLER_ID %in% cyclers_left & TEAM_ID == player_reactive$team, .N]
 
@@ -120,6 +122,7 @@ observeEvent(input$confim_first_played_cycler, {
   con <- connDB(con, "flaimme")
   dbWriteTable(con, "MOVE_FACT", appendaa, row.names = FALSE, append = TRUE)
   move_fact$data <- dbSelectAll("MOVE_FACT", con)[GAME_ID == player_reactive$game & TOURNAMENT_NM == input$join_tournament]
+  }
   }
 })
 

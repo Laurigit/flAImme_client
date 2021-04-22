@@ -22,6 +22,7 @@ ui_control <- reactiveValues(table = FALSE,
 betting_phase <- reactive({
   print("reactive betting_phase")
 req(player_reactive$team)
+
 #phases
   #0 I have not selected participant
   #1 I have not selectet firs card. Show card options
@@ -32,10 +33,13 @@ req(player_reactive$team)
     ###########
   input$join_tournament
   input$save_betted_card
+
+  breakaway_bets_data2()
   #########
-  who_is_betting <-   breakaway_bets_data()[TEAM_ID == player_reactive$team]
+  who_is_betting <-   breakaway_bets_data()[TEAM_ID == player_reactive$team & GAME_ID ==  curr_game_id(input$join_tournament, con)]
   #check if we have a better
   bet_phase <- 0
+
   if (nrow(who_is_betting) > 0) {
     bet_phase <- 1
     my_cycler <- who_is_betting[TEAM_ID == player_reactive$team, CYCLER_ID]
@@ -44,10 +48,11 @@ req(player_reactive$team)
     # #check if we have already chosen first card
 
     if (who_is_betting[, FIRST_BET] > 0) {
+
       bet_phase <- 1.5
     #check if everyone else have bet
       count_teams <- tournament$data[TOURNAMENT_NM == input$join_tournament, uniqueN(TEAM_ID)]
-      ba_data <- breakaway_bets_data()[TOURNAMENT_NM == input$join_tournament]
+      ba_data <- breakaway_bets_data()[TOURNAMENT_NM == input$join_tournament  & GAME_ID == curr_game_id(input$join_tournament, con)]
       unplayed_count <- count_teams - ba_data[FIRST_BET > 0, .N]
       if (unplayed_count == 0) {
         bet_phase <- 2
@@ -74,8 +79,8 @@ req(player_reactive$team)
 output$breakaway_options <- renderUI({
   print("output betting_phase")
 if (ui_control$cards) {
-  my_cycler <- breakaway_bets_data()[TEAM_ID == player_reactive$team, CYCLER_ID]
-  card_choises <-  breakaway_cards()[CYCLER_ID == my_cycler & HAND_NUMBER == ui_control$input_hand_number & TOURNAMENT_NM == input$join_tournament, CARD_ID]
+  my_cycler <- breakaway_bets_data()[TEAM_ID == player_reactive$team & GAME_ID == curr_game_id(input$join_tournament, con) & TOURNAMENT_NM == input$join_tournament, CYCLER_ID]
+  card_choises <-  breakaway_cards()[CYCLER_ID == my_cycler & GAME_ID == curr_game_id(input$join_tournament, con) & HAND_NUMBER == ui_control$input_hand_number & TOURNAMENT_NM == input$join_tournament, CARD_ID]
   cards_label <- paste0("Hand number ", ui_control$input_hand_number,". Select card to bet")
   fluidRow(radioGroupButtons(inputId = "break_away_buttons",
                              status = "info",
@@ -93,12 +98,14 @@ if (ui_control$cards) {
 
 observe({
   print("output breakaway_cards")
+
   req(breakaway_cards())
 
   req(breakaway_bets_data(),  input$join_tournament, player_reactive$team)
+
   #disable confirm unless everyone has selected first bet
   #count missing decisions
-  ba_data <- breakaway_bets_data()[TOURNAMENT_NM == input$join_tournament]
+  ba_data <- breakaway_bets_data()[TOURNAMENT_NM == input$join_tournament & GAME_ID ==  curr_game_id(input$join_tournament, con)]
   my_bet <- ba_data[TEAM_ID == player_reactive$team, FIRST_BET]
   ui_control$confirm <- FALSE
   ui_control$cards <- FALSE
@@ -196,17 +203,18 @@ observeEvent(input$save_betted_card, {
 
   #save to db
   #update ui
+
   betted_card <- input$break_away_buttons
   con <- connDB(con, "flaimme")
     if (betting_phase() == 1) {
   dbQ(paste0('UPDATE BREAKAWAY_BET
       SET FIRST_BET = ', betted_card,
-             ' WHERE TEAM_ID = ', player_reactive$team, ' AND TOURNAMENT_NM = "', input$join_tournament, '"'), con)
+             ' WHERE GAME_ID = ', curr_game_id(input$join_tournament, con), ' AND TEAM_ID = ', player_reactive$team, ' AND TOURNAMENT_NM = "', input$join_tournament, '"'), con)
     } else if(betting_phase() == 2) {
 
       dbQ(paste0('UPDATE BREAKAWAY_BET
       SET SECOND_BET = ', betted_card,
-                  ' WHERE TEAM_ID = ', player_reactive$team, ' AND TOURNAMENT_NM = "', input$join_tournament, '"'), con)
+                  ' WHERE GAME_ID = ', curr_game_id(input$join_tournament, con), ' AND TEAM_ID = ', player_reactive$team, ' AND TOURNAMENT_NM = "', input$join_tournament, '"'), con)
 }
   update_breakaway_bet$data  <- update_breakaway_bet$data + 1
 })
@@ -221,8 +229,8 @@ if (ui_control$table == TRUE) {
   req(player_reactive$team)
   con <- connDB(con, "flaimme")
 
-  ba_data <- breakaway_bets_data()[TOURNAMENT_NM == input$join_tournament]
-  #sakari, rouler, bet_amount
+  ba_data <- breakaway_bets_data()[TOURNAMENT_NM == input$join_tournament & GAME_ID ==  curr_game_id(input$join_tournament, con)]
+
   join_player <- tournament$data[TOURNAMENT_NM == input$join_tournament][ba_data, on = "TEAM_ID"]
   join_cycler_type <- ADM_CYCLER_INFO[join_player, on = "CYCLER_ID"]
   if (betting_phase() < 3) {

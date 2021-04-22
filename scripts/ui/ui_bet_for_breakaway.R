@@ -11,5 +11,4 @@ tabItem(tabName = "tab_bet_for_breakaway",
         fluidRow(        uiOutput(outputId = "breakaway_options")),
         fluidRow(  actionButton(inputId = "save_betted_card", label = "Confirm selected card")),
         fluidRow(uiOutput("betting_done"))
-
 )

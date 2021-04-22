@@ -25,17 +25,19 @@ shinyServer(function(input, output, session) {
 observe({
   req(input$join_tournament)
   #no games with SLOTS_OVER_FINISH < 0, then show all menus
+max_started_game <- game_status_simple()[TOURNAMENT_NM == input$join_tournament  & TURN_ID > 0, max(GAME_ID)]
+max_finished_game <- tournament_result$data[TOURNAMENT_NM == input$join_tournament & SLOTS_OVER_FINISH > 0, max(GAME_ID)]
+  #unfinished_cyclers <- tournament_result$data[SLOTS_OVER_FINISH < 0, .N]
 
-  unfinished_cyclers <- tournament_result$data[SLOTS_OVER_FINISH < 0, .N]
+  #ba_kesken <- breakaway_cards()[, .(TOURNAMENT_NM)]
+  if (max_started_game > max_finished_game) {
+    shinyjs::addClass(selector = "body", class = "sidebar-collapse")
+    js$hidehead('none')
 
-  ba_kesken <- breakaway_cards()[, .(TOURNAMENT_NM)]
-  if (unfinished_cyclers == 0 | nrow(ba_kesken) > 0) {
+  } else {
     js$hidehead('')
     shinyjs::removeClass(selector = "body", class = "sidebar-collapse")
 
-  } else {
-    shinyjs::addClass(selector = "body", class = "sidebar-collapse")
-    js$hidehead('none')
   }
 #corona
 })
@@ -43,14 +45,14 @@ observe({
 
 
   #try to read status of breakaway bets
- #breakaway_bets_data <-  my_reactivePoll(session, "BREAKAWAY_BET", paste0('SELECT count(TEAM_ID) from BREAKAWAY_BET'), timeout = 1000, con)
- breakaway_cards <-  my_reactivePoll(session, "BREAKAWAY_BET_CARDS", paste0('SELECT * from BREAKAWAY_BET_CARDS'), timeout = 1000, con)
+ breakaway_bets_data2 <-  suppressWarnings(my_reactivePoll(session, "BREAKAWAY_BET", paste0('SELECT sum(FIRST_BET) + sum(SECOND_BET) from BREAKAWAY_BET'), timeout = 1000, con))
+ breakaway_cards <-  suppressWarnings(my_reactivePoll(session, "BREAKAWAY_BET_CARDS", paste0('SELECT * from BREAKAWAY_BET_CARDS'), timeout = 1000, con))
 
- game_status_simple <-  my_reactivePoll(session, "GAME_STATUS", paste0('SELECT sum(CYCLER_ID) FROM GAME_STATUS'), timeout = 1000, con)
+ game_status_simple <-  suppressWarnings(my_reactivePoll(session, "GAME_STATUS", paste0('SELECT sum(CYCLER_ID) FROM GAME_STATUS'), timeout = 1000, con))
 
- deck_status_data <-  my_reactivePoll(session, "DECK_STATUS", paste0('SELECT sum(CYCLER_ID) FROM DECK_STATUS'), timeout = 1000, con)
+ deck_status_data <-  suppressWarnings(my_reactivePoll(session, "DECK_STATUS", paste0('SELECT sum(CYCLER_ID) FROM DECK_STATUS'), timeout = 1000, con))
 
- tournament_data_reactive <- my_reactivePoll(session, "TOURNAMENT_RESULT", "SELECT * FROM TOURNAMENT_RESULT", 2000, con)
+ tournament_data_reactive <- suppressWarnings(my_reactivePoll(session, "TOURNAMENT_RESULT", "SELECT * FROM TOURNAMENT_RESULT", 1000, con))
 
  deck_status_curr_game <- reactive({
 

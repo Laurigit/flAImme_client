@@ -4,6 +4,10 @@ observeEvent(input$show_map, {
   updateTabItems(session, "sidebarmenu", selected = "tab_game_status")
 })
 
+observeEvent(input$show_map, {
+  #updateTabItems(session, "sidebarmenu", selected = "tab_game_status")
+})
+
 output$players <-  renderDataTable({
 
   tn_data <- tournament_result$data[TOURNAMENT_NM == input$join_tournament]
@@ -238,4 +242,6 @@ output$other_decks <- DT::renderDataTable({
 
  }
 })
+
+
 

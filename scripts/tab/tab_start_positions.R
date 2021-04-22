@@ -27,7 +27,7 @@ print("start_pos_data")
   curr_tour_cyclers <- tournament$data[TOURNAMENT_NM == input$join_tournament, TEAM_ID]
   curr_info <- ADM_CYCLER_INFO[TEAM_ID %in% curr_tour_cyclers]
   join_sort <- ss_sort[curr_info, on = "CYCLER_ID"]
-  join_sort <- join_sort[order(posit)]
+  join_sort <- join_sort[order(-posit)]
   join_sort[, posit := NULL]
   join_sort
 })
