@@ -27,7 +27,7 @@ library(testthat)
 library(DT)
 library(gridExtra)
 library(ggplot2)
-
+options(shiny.fullstacktrace = TRUE)
 #options(shiny.trace=FALSE)
 
 
@@ -62,7 +62,7 @@ dbSendQuery(con, 'SET NAMES utf8')
 dbQ("SHOW TABLES", con)
 luettu <- dbSelectAll("ADM_OPTIMAL_MOVES", con)
 
-ADM_OPTIMAL_MOVES <- fix_colnames(luettu)
+
 setDTthreads(4)
 
 required_data(c("STG_CYCLER", "STG_TRACK", "ADM_CYCLER_INFO"))
