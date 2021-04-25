@@ -205,6 +205,7 @@ observeEvent(input$save_betted_card, {
   #update ui
 
   betted_card <- input$break_away_buttons
+  if (!is.null(betted_card)) {
   con <- connDB(con, "flaimme")
     if (betting_phase() == 1) {
   dbQ(paste0('UPDATE BREAKAWAY_BET
@@ -217,6 +218,7 @@ observeEvent(input$save_betted_card, {
                   ' WHERE GAME_ID = ', curr_game_id(input$join_tournament, con), ' AND TEAM_ID = ', player_reactive$team, ' AND TOURNAMENT_NM = "', input$join_tournament, '"'), con)
 }
   update_breakaway_bet$data  <- update_breakaway_bet$data + 1
+  }
 })
 
 output$breakaway_results <- renderTable({
