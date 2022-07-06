@@ -48,7 +48,7 @@ max_finished_game <- tournament_result$data[TOURNAMENT_NM == input$join_tourname
  breakaway_bets_data2 <-  suppressWarnings(my_reactivePoll(session, "BREAKAWAY_BET", paste0('SELECT sum(FIRST_BET) + sum(SECOND_BET) from BREAKAWAY_BET'), timeout = 1000, con))
  breakaway_cards <-  suppressWarnings(my_reactivePoll(session, "BREAKAWAY_BET_CARDS", paste0('SELECT * from BREAKAWAY_BET_CARDS'), timeout = 1000, con))
 
- game_status_simple <-  suppressWarnings(my_reactivePoll(session, "GAME_STATUS", paste0('SELECT sum(CYCLER_ID) FROM GAME_STATUS'), timeout = 1000, con))
+ game_status_simple <-  suppressWarnings(my_reactivePoll(session, "GAME_STATUS", paste0('SELECT sum(CYCLER_ID) FROM GAME_STATUS'), timeout = 500, con))
 
  deck_status_data <-  suppressWarnings(my_reactivePoll(session, "DECK_STATUS", paste0('SELECT sum(CYCLER_ID) FROM DECK_STATUS'), timeout = 1000, con))
 
