@@ -11,7 +11,7 @@ tabItem(tabName = "tab_game_setup",
 
                    radioGroupButtons(inputId = "blue_setup",
                                          label = "Blue team",
-                                         choices = c("Human", "AI", "AI autocards", "Human"),
+                                         choices = c("Human", "AI", "AI autocards", "Not playing"),
                                          selected = "Human",
                                          direction = "horizontal"
                                          ),
@@ -22,7 +22,7 @@ tabItem(tabName = "tab_game_setup",
                    ),
           fluidRow( radioGroupButtons(inputId = "red_setup",
                                       label = "Red team",
-                                      choices = c("Human", "AI", "AI autocards", "Human"),
+                                      choices = c("Human", "AI", "AI autocards", "Not playing"),
                                       selected = "Human",
                                       direction = "horizontal"
                     ),
