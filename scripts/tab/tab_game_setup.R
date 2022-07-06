@@ -34,8 +34,11 @@ observeEvent(input$save_players, {
   loop_input <- c(input$red_setup,input$blue_setup,  input$black_setup,
                   input$green_setup,input$purple_setup,input$white_setup
   )
+  print(loop_input)
   name_input <- c(input$red_name, input$blue_name, input$black_name,
                   input$green_name, input$purple_name, input$white_name)
+  print(name_input)
+  print(input$red_name)
   game_setup_data <- data.table(TEAM_ID = 1:6, status = "", PLAYER_NM = "")
   loop_counter <- 0
 
@@ -59,6 +62,7 @@ observeEvent(input$save_players, {
 
   filter <- join_status[status != "Not playing"]
   sscols_to_db <- filter[, .(TOURNAMENT_NM, TEAM_ID, PLAYER_TYPE = status, PLAYER_NM)]
+  print(filter)
   con <- connDB(con, "flaimme")
   dbWriteTable(con, "TOURNAMENT", sscols_to_db, append = TRUE, row.names = FALSE)
 
