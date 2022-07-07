@@ -40,14 +40,17 @@ create_track_status_map_scrollable <- function(ADM_CYCLER_INFO, game_status, tra
   filter_lanes <- join_pa_map[GAME_SLOT_ID < first_extra_slot]
   filter_lanes[, SLOT_Y_AXIS := GAME_SLOT_ID]
 
-  aggr_slot_coord <- track_info[, .N, by = .(GAME_SLOT_ID, SLOT_COORD)][, N := NULL]
+  aggr_slot_coord_orig <- track_info[, .N, by = .(GAME_SLOT_ID, SLOT_COORD)][, N := NULL]
+  max_id_from_orig <- aggr_slot_coord_orig[, max(GAME_SLOT_ID)] + 1
+continue_coords <- data.table(GAME_SLOT_ID = max_id_from_orig:(max_id_from_orig+100), SLOT_COORD = "*")
+aggr_slot_coord <- rbind(aggr_slot_coord_orig, continue_coords)
 
    last_cycler_last <- filter_lanes[CYCLER_ID > 0, min(GAME_SLOT_ID)]
-  last_visualized_slot <- filter_lanes[, max(GAME_SLOT_ID)] + 1
+  last_visualized_slot <- filter_lanes[, max(GAME_SLOT_ID)] + 1 + last_cycler_last
   twenty_from_finish <- last_visualized_slot - 20
   first_visualized_slot <- max(1, min(last_cycler_last, twenty_from_finish))
 
-  labels <- c(aggr_slot_coord[GAME_SLOT_ID >= first_visualized_slot & GAME_SLOT_ID <= last_visualized_slot, SLOT_COORD])
+  labels <- c(aggr_slot_coord[GAME_SLOT_ID >= first_visualized_slot & GAME_SLOT_ID < last_visualized_slot, SLOT_COORD])
   input_breaks <- c(rep((first_visualized_slot):(last_visualized_slot - 1)))
 
   p1 <- ggplot(filter_lanes,

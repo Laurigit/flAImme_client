@@ -45,7 +45,7 @@ output$select_which_cycler_plays_first <- renderUI({
 
 
   cyclers_left <- gs_data[TURN_ID == max_gs_turn & CYCLER_ID > 0, CYCLER_ID]
-  my_options <- isolate(ADM_CYCLER_INFO[CYCLER_ID %in% cyclers_left & TEAM_ID == player_reactive$team, CYCLER_TYPE_NAME])
+  my_options <- isolate(ADM_CYCLER_INFO[CYCLER_ID %in% cyclers_left & TEAM_ID == player_reactive$team, str_sub(CYCLER_TYPE_NAME, 1, 3)])
 
 splitLayout(cellWidths = c("20%", "40%", "40%"),
             actionBttn(inputId = "back_to_stats3", label = "Stats", style = "material-flat", color = "default", size = "md", block = TRUE),
@@ -193,7 +193,7 @@ output$select_played_card <- renderUI({
                                     TEAM_ID == player_reactive$team & CARD_ID != -1 & TURN_ID == turni, CARD_ID]
     my_cyc_type <- ADM_CYCLER_INFO[CYCLER_ID == moving_cycler, CYCLER_TYPE_NAME]
 
-    first_or_second <- paste0("Play ", my_cyc_type, " (", first_move, ")")
+    first_or_second <- paste0("Play ", str_sub(my_cyc_type, 1, 3), " (", first_move, ")")
   }  else ({
     # move_to$tab <- "tab_game_status"
     #updateTabItems(session, "sidebarmenu", selected = "tab_game_status")
