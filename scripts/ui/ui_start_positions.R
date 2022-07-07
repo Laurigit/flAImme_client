@@ -12,7 +12,8 @@ fluidPage(
         actionButton("save_initial_grid", "Save grid order", width = "25%"),
         disabled(actionButton("bet_for_breakaway", "Bet for breakaway", width = "25%")),
         disabled(actionButton("start_game", "Start game", width = "25%")),
-       actionButton("start_after_betting", "Start after betting game", width = "25%")
+       actionButton("start_after_betting", "Start after betting game", width = "25%"),
+       uiOutput("grid_in_text")
 
 
 )),

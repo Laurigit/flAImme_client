@@ -122,6 +122,8 @@ req(input$join_tournament)
   }
 })
 
+
+grid_order_reactive <- reactiveValues(order = NULL)
 observeEvent(input$save_initial_grid, {
   #games starts from here!
   #get free game id
@@ -166,6 +168,17 @@ observeEvent(input$save_initial_grid, {
   move_fact$data <- dbSelectAll("MOVE_FACT", con)[GAME_ID == player_reactive$game & TOURNAMENT_NM == input$join_tournament]
 })
 
+observe({
+
+  req(input$dragula)
+  grid_order <- data.table(UI_text = dragulaValue(input$dragula)$cyclersInput)
+  grid_order_reactive$order <- grid_order[, UI_text]
+})
+output$grid_in_text <- renderUI({
+
+  res <- HTML(paste0(grid_order_reactive$order, collapse = "<br>"))
+res
+})
 
 observeEvent(c(
   input$start_game,
