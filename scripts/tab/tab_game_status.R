@@ -1,15 +1,33 @@
 # #tab_game_status
 
 
-
-
-
+#
+# game_status_slower <- reactiveValues(time = Sys.time(), prev_gs = NULL)
+# observe({
+#   #this stops UI for 5sec max after map game_status update
+#   req(game_status())
+#
+#
+#   if (is.null( game_status_slower$prev_gs)) {
+#     game_status_slower$prev_gs <- game_status()
+#   }
+# if (game_status()[CYCLER_ID > 0, sum(GAME_SLOT_ID)] != game_status_slower$prev_gs[CYCLER_ID > 0, sum(GAME_SLOT_ID)]) {
+#   duration <- difftime(Sys.time(), game_status_slower$time, units = c("secs"))
+#   wait_time <- max(0, 5 - duration)
+#   print(wait_time)
+#   Sys.sleep(wait_time)
+#   game_status_slower$time <- Sys.time()
+#   game_status_slower$prev_gs <- game_status()
+# }
+#
+# })
 
 
 output$game_map_full <- renderPlot({
 
 
 req( game_status())
+
 
   p1 <- create_track_status_map_FULL(ADM_CYCLER_INFO, game_status(), player_reactive$team)
 
@@ -46,7 +64,7 @@ output$select_which_cycler_plays_first <- renderUI({
 
   cyclers_left <- gs_data[TURN_ID == max_gs_turn & CYCLER_ID > 0, CYCLER_ID]
   my_options <- isolate(ADM_CYCLER_INFO[CYCLER_ID %in% cyclers_left & TEAM_ID == player_reactive$team, str_sub(CYCLER_TYPE_NAME, 1, 3)])
-
+my_values <- isolate(ADM_CYCLER_INFO[CYCLER_ID %in% cyclers_left & TEAM_ID == player_reactive$team, CYCLER_TYPE_NAME])
 splitLayout(cellWidths = c("20%", "40%", "40%"),
             actionBttn(inputId = "back_to_stats3", label = "Stats", style = "material-flat", color = "default", size = "md", block = TRUE),
 
@@ -58,7 +76,8 @@ splitLayout(cellWidths = c("20%", "40%", "40%"),
                              block = TRUE),
       radioGroupButtons(inputId = "radio_first_cycler",
                                        label = NULL,
-                                       choices = my_options,
+                                       choiceNames  = my_options,
+                                       choiceValues  = my_values,
                                        selected = -1,
                                        status = "info",
                                        direction = "horizontal",
