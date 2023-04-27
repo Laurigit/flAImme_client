@@ -1,4 +1,4 @@
-create_track_status_map_scrollable <- function(ADM_CYCLER_INFO, game_status, track_info, team_id) {
+create_track_status_map_scrollable <- function(ADM_CYCLER_INFO, game_status, track_info, team_id, exhausted_cyclers = NULL) {
 
   finish_slot <- game_status[FINISH == 1, max(GAME_SLOT_ID)]
   max_lanes <- game_status[GAME_SLOT_ID <= finish_slot, max(LANE_NO)]
@@ -18,6 +18,7 @@ create_track_status_map_scrollable <- function(ADM_CYCLER_INFO, game_status, tra
 
 
   joinaa[, text_size := ifelse(TEAM_ID == team_id, 12, 10)]
+  joinaa[, text_size_exh := ifelse(TEAM_ID == team_id, 6, 6)]
   joinaa[, fontti := ifelse(TEAM_ID == team_id, "bold", "plain")]
 
   color_mapping_table <- data.table(CYCLER_ID = c(0,1,2,3,4,5,6,7,8,9,10,11,12),
@@ -39,6 +40,7 @@ create_track_status_map_scrollable <- function(ADM_CYCLER_INFO, game_status, tra
   first_extra_slot <- game_status[LANE_NO > 3, min(GAME_SLOT_ID)]
   filter_lanes <- join_pa_map[GAME_SLOT_ID < first_extra_slot]
   filter_lanes[, SLOT_Y_AXIS := GAME_SLOT_ID]
+  filter_lanes[, EXHAUSTED := ifelse(CYCLER_ID %in% exhausted_cyclers, 'z', NA)]
 
   aggr_slot_coord_orig <- track_info[, .N, by = .(GAME_SLOT_ID, SLOT_COORD)][, N := NULL]
   max_id_from_orig <- aggr_slot_coord_orig[, max(GAME_SLOT_ID)] + 1
@@ -58,6 +60,7 @@ aggr_slot_coord <- rbind(aggr_slot_coord_orig, continue_coords)
     #geom_tile(color = "gray", size = 5) +
     geom_tile(aes( color=as.factor(pa_color_with_finish), width = 1, height = 0.92), size = 1.2) +
     geom_text(aes(label = SHORT_TYPE, color = as.factor(font_color), size = text_size, fontface = fontti)) +
+    geom_text(aes(hjust = -0.8, vjust = 0.7, label = EXHAUSTED, color = as.factor(font_color), size = text_size_exh, fontface = fontti)) +
     scale_size(range = c(10, 12), guide = F) +#legend hidden +
     scale_fill_manual(values=c("1" = "red",
                                "2" = "blue3",

@@ -20,6 +20,11 @@ output$my_name_is <- renderUI({
 
 })
 
+observeEvent(input$my_name, {
+  shinyjs::enable("save_me")
+})
+
+
 observeEvent(input$save_me, {
   player_reactive$name <- input$my_name
   #find my team id

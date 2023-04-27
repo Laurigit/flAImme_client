@@ -84,7 +84,7 @@ output$show_tour_teamsc <- DT::renderDataTable({
 
 
   player_names <- tournament$data[TOURNAMENT_NM == input$join_tournament, .(TEAM_ID, PLAYER_NM)]
-  join_names <- player_names[attr_stats_cycler, on = "TEAM_ID"]
+  join_names <- player_names[attr_stats_cycler, on = "TEAM_ID"][order(-POINTS)]
   rs <- datatable(join_names[, .(Player = PLAYER_NM,
                                  Points = POINTS)], rownames = FALSE, options = list(info = FALSE,
                                                                                       autoWidth = TRUE,

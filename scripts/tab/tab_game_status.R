@@ -50,7 +50,12 @@ output$game_map_scroll <- renderPlot({
   track <- tn_data[LANE == -1, max(TRACK_ID)]
 
   track_info <- create_track_ui_info(STG_TRACK, STG_TRACK_PIECE, track)
-  p2 <- create_track_status_map_scrollable(ADM_CYCLER_INFO, game_status(), track_info, player_reactive$team)
+  relevant_turn <- deck_status_curr_game()[HAND_OPTIONS == 0, max(TURN_ID)]
+  copy_data <- copy(deck_status_curr_game()[TURN_ID >= 1 & CARD_ID == 1 & TURN_ID == relevant_turn])
+  copy_data[, only_one := .N, by = .(row_id)]
+  exhausted_cyclers <- copy_data[only_one == 1, CYCLER_ID]
+
+  p2 <- create_track_status_map_scrollable(ADM_CYCLER_INFO, game_status(), track_info, player_reactive$team, exhausted_cyclers)
   p2
 })
 

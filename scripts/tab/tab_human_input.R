@@ -231,7 +231,7 @@ output$other_decks <- DT::renderDataTable({
                                                                                         colnames(resdata)[2:ncol(resdata)],
                                                                                         target = 'cell',
                                                                                         color = "black",
-                                                                                        backgroundColor = styleEqual(c(1, 2, 3, 0), c("orange", "yellow", "green", "red")
+                                                                                        backgroundColor = styleEqual(c(1, 2, 3, 0, 4, 5, 6, 7, 8, 9, 10), c("orange", "yellow", "green", "grey", "red", "red", "red", "red", "red", "red", "red")
                                                                                         )
                                                                                       ) %>% formatStyle(columns = c(1,2,3,4,5,6,7,8,9), width='1px') %>% formatStyle(
     'C',
