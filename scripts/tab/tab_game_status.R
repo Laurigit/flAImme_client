@@ -44,18 +44,22 @@ p1
 output$game_map_scroll <- renderPlot({
 
   tn_data <- tournament_result$data[TOURNAMENT_NM == input$join_tournament]
-
-
-
+  maxgame <- tn_data[, max(GAME_ID)]
+  copy_tn <- copy(tn_data)[GAME_ID == maxgame]
+  copy_tn[FINISH_TURN > 0, finish_score := -FINISH_TURN*1000+SLOTS_OVER_FINISH*10-LANE]
+  copy_tn[FINISH_TURN > 0, FINISH_RANK := frank(finish_score)]
+  finished_turn <- copy_tn[FINISH_TURN > 0, min(FINISH_TURN )]
+  track_finish_slot <- game_status()[FINISH == 1, max(GAME_SLOT_ID)]
+  podium_data <- copy_tn[FINISH_TURN == finished_turn, .(GAME_SLOT_ID = track_finish_slot + SLOTS_OVER_FINISH  - 1, LANE_NO = LANE, CYCLER_ID, FINISH_RANK)]
   track <- tn_data[LANE == -1, max(TRACK_ID)]
-
   track_info <- create_track_ui_info(STG_TRACK, STG_TRACK_PIECE, track)
   relevant_turn <- deck_status_curr_game()[HAND_OPTIONS == 0, max(TURN_ID)]
   copy_data <- copy(deck_status_curr_game()[TURN_ID >= 1 & CARD_ID == 1 & TURN_ID == relevant_turn])
   copy_data[, only_one := .N, by = .(row_id)]
   exhausted_cyclers <- copy_data[only_one == 1, CYCLER_ID]
 
-  p2 <- create_track_status_map_scrollable(ADM_CYCLER_INFO, game_status(), track_info, player_reactive$team, exhausted_cyclers)
+  prev_moves <- move_fact$data[TURN_ID == relevant_turn, .(CYCLER_ID, CARD_ID)]
+  p2 <- create_track_status_map_scrollable(ADM_CYCLER_INFO, game_status(), track_info, player_reactive$team, exhausted_cyclers, podium_data, prev_moves)
   p2
 })
 
@@ -180,7 +184,9 @@ output$db_text <- renderText({
 
 
 output$play_or_confirm <- renderUI({
+
 req(played_card_status())
+
   shinyjs::disable("confirm_selected_card")
   if (played_card_status() == 1) {
     uiOutput("select_which_cycler_plays_first")
@@ -233,6 +239,7 @@ output$select_played_card <- renderUI({
            disabled(actionBttn(inputId = "confirm_selected_card", label = first_or_second,
                                style = "material-flat", size = "md", block = TRUE)
     ),
+
      radioGroupButtons(inputId = "select_played_card",
                                             label = NULL,
                                             selected = -1,
