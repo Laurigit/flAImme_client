@@ -1,4 +1,4 @@
-create_track_status_map_scrollable <- function(ADM_CYCLER_INFO, game_status, track_info, team_id, exhausted_cyclers = NULL, podium_data = NULL, prev_moves = NULL) {
+create_track_status_map_scrollable <- function(ADM_CYCLER_INFO, game_status, track_info, team_id, exhausted_cyclers = NULL, podium_data = NULL, prev_moves = NULL, ss_movement_gained = NULL) {
 
   finish_slot <- game_status[FINISH == 1, max(GAME_SLOT_ID)]
   max_lanes <- game_status[GAME_SLOT_ID <= finish_slot, max(LANE_NO)]
@@ -29,7 +29,8 @@ create_track_status_map_scrollable <- function(ADM_CYCLER_INFO, game_status, tra
 
   color_mapping_table <- data.table(CYCLER_ID = c(0,1,2,3,4,5,6,7,8,9,10,11,12),
                                     color_id = c(9,1,1,2,2,3,3,4,4,5,5,6,6),
-                                    font_color = c(9,6,6,6,6,6,6,6,6,3,3,3,3))
+                                    font_color = c(9,6,6,6,6,6,6,6,6,3,3,3,3),
+                                    exh_font_color = c(9,3,3,1,1,1,1,1,1,1,1,1,1))
   piece_attribute_map <- data.table(PIECE_ATTRIBUTE  = c("N", "M", "A", "C", "S"),
                                     pa_color = c(12, 1, 11, 7, 8))
 
@@ -48,8 +49,14 @@ create_track_status_map_scrollable <- function(ADM_CYCLER_INFO, game_status, tra
   filter_lanes2[, SLOT_Y_AXIS := GAME_SLOT_ID]
   filter_lanes2[, EXHAUSTED := ifelse(CYCLER_ID %in% exhausted_cyclers, 'z', NA)]
 
+  #join_movement_gained
+  filter_lanes3 <- ss_movement_gained[filter_lanes2, on = .(CYCLER_ID)]
+
   #join_prev_move
-  filter_lanes <- prev_moves[filter_lanes2, on = .(CYCLER_ID)]
+  filter_lanes <- prev_moves[filter_lanes3, on = .(CYCLER_ID)]
+  filter_lanes[, MOVE_DIFF := (MOVEMENT_GAINED - pmax(CARD_ID, 2))]
+  filter_lanes[, MOVE_DIFF_TEXT := ifelse(MOVE_DIFF == 0, "", MOVE_DIFF)]
+
 
   aggr_slot_coord_orig <- track_info[, .N, by = .(GAME_SLOT_ID, SLOT_COORD)][, N := NULL]
   max_id_from_orig <- aggr_slot_coord_orig[, max(GAME_SLOT_ID)] + 1
@@ -69,8 +76,9 @@ aggr_slot_coord <- rbind(aggr_slot_coord_orig, continue_coords)
     #geom_tile(color = "gray", size = 5) +
     geom_tile(aes( color=as.factor(pa_color_with_finish), width = 1, height = 0.92), size = 1.2) +
     geom_text(aes(label = SHORT_TYPE, color = as.factor(font_color), size = text_size, fontface = fontti)) +
-    geom_text(aes(hjust = -0.8, vjust = 0.7, label = EXHAUSTED, color = as.factor(font_color), size = text_size_exh, fontface = fontti)) +
-    geom_text(aes(hjust = 1.8, vjust = 0.7, label = CARD_ID, color = as.factor(font_color), size = text_size_exh, fontface = fontti)) +
+    geom_text(aes(hjust = -0.8, vjust = 0.9, label = EXHAUSTED, color = as.factor(exh_font_color), size = text_size_exh, fontface = fontti)) +
+    geom_text(aes(hjust = 1.8, vjust = 0.9, label = CARD_ID, color = as.factor(font_color), size = text_size_exh, fontface = fontti)) +
+    geom_text(aes(hjust = -0.8, vjust = -0.1, label = MOVE_DIFF_TEXT, color = as.factor(font_color), size = text_size_exh, fontface = fontti)) +
     scale_size(range = c(10, 12), guide = F) +#legend hidden +
     scale_fill_manual(values=c("1" = "red",
                                "2" = "blue3",

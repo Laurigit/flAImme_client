@@ -59,7 +59,26 @@ output$game_map_scroll <- renderPlot({
   exhausted_cyclers <- copy_data[only_one == 1, CYCLER_ID]
 
   prev_moves <- move_fact$data[TURN_ID == relevant_turn, .(CYCLER_ID, CARD_ID)]
-  p2 <- create_track_status_map_scrollable(ADM_CYCLER_INFO, game_status(), track_info, player_reactive$team, exhausted_cyclers, podium_data, prev_moves)
+  gs_local <- game_status_simple_current_game()
+
+  turni_used <- gs_local[, max(TURN_ID)]
+  posits_prev <- create_game_status_from_simple(gs_local[TURN_ID == (turni_used - 1)],
+                                                track,
+                                                STG_TRACK,
+                                                STG_TRACK_PIECE
+  )[CYCLER_ID > 0, .(GSID_OLD = GAME_SLOT_ID, CYCLER_ID)]
+  posits_after <- create_game_status_from_simple(gs_local[TURN_ID == (turni_used )],
+                                                 track,
+                                                 STG_TRACK,
+                                                 STG_TRACK_PIECE
+  )[CYCLER_ID > 0, .(GAME_SLOT_ID, CYCLER_ID)]
+  joinaa <- posits_prev[posits_after, on = "CYCLER_ID"]
+  joinaa[, MOVEMENT_GAINED := GAME_SLOT_ID - GSID_OLD]
+  ss_movement_gained <- joinaa[, .(CYCLER_ID, MOVEMENT_GAINED)]
+
+
+  p2 <- create_track_status_map_scrollable(ADM_CYCLER_INFO, game_status(), track_info, player_reactive$team, exhausted_cyclers, podium_data, prev_moves,
+                                           ss_movement_gained)
   p2
 })
 
