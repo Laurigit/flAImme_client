@@ -114,7 +114,10 @@ con <- connDB(con, "flaimme")
 
 
 played_card_status <- reactive({
-  req(input$join_tournament)
+
+ # print(player_reactive$team)
+
+    req(input$join_tournament)
     req( move_fact$data)
     req(player_reactive$team)
 

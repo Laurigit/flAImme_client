@@ -103,7 +103,15 @@ req(input$join_tournament)
         players_in_latest_game <- tournament_result$data[TOURNAMENT_NM == input$join_tournament & GAME_ID == newest_game, .N]
         finished_players <- tournament_result$data[TOURNAMENT_NM == input$join_tournament & GAME_ID == newest_game & FINISH_TURN > 0, .N]
         latest_game_finished <- players_in_latest_game == finished_players
-        if (latest_game_finished) {
+
+        some_finished <- tournament_result$data[TOURNAMENT_NM == input$join_tournament & GAME_ID == newest_game & FINISH_TURN > 0, .N] > 0
+        some_unfinished <- tournament_result$data[TOURNAMENT_NM == input$join_tournament & GAME_ID == newest_game & FINISH_TURN <= 0, .N] > 0
+        game_is_still_on <- some_finished & some_unfinished
+        if (game_is_still_on) {
+          shinyjs::disable("save_initial_grid")
+          shinyjs::disable("bet_for_breakaway")
+          shinyjs::disable("start_game")
+          } else  if (latest_game_finished) {
           #pevious game started, no new
           shinyjs::enable("save_initial_grid")
           shinyjs::disable("bet_for_breakaway")

@@ -1,4 +1,4 @@
-create_track_status_map_scrollable <- function(ADM_CYCLER_INFO, game_status, track_info, team_id, exhausted_cyclers = NULL) {
+create_track_status_map_scrollable <- function(ADM_CYCLER_INFO, game_status, track_info, team_id, exhausted_cyclers = NULL, podium_data = NULL, prev_moves = NULL) {
 
   finish_slot <- game_status[FINISH == 1, max(GAME_SLOT_ID)]
   max_lanes <- game_status[GAME_SLOT_ID <= finish_slot, max(LANE_NO)]
@@ -9,9 +9,15 @@ create_track_status_map_scrollable <- function(ADM_CYCLER_INFO, game_status, tra
     game_status[, lane_intend := ifelse(lanes_per_slot == 2, 0, 0.5)]
   }
 
-  cycler_pos <- game_status[, .(LANE_graph = 4- LANE_NO - lane_intend, GAME_SLOT_ID, PIECE_ATTRIBUTE, CYCLER_ID, LANE_NO)]
+  cycler_pos_orig <- game_status[, .(LANE_graph = 4- LANE_NO - lane_intend, GAME_SLOT_ID, PIECE_ATTRIBUTE, CYCLER_ID, LANE_NO)]
   #browser()
+  ss_pod <- podium_data[, .(PODIUM = CYCLER_ID, LANE_NO, GAME_SLOT_ID)]
 
+
+  cycler_pos <- ss_pod[cycler_pos_orig, on = .(LANE_NO, GAME_SLOT_ID)]
+
+  cycler_pos[!is.na(PODIUM), CYCLER_ID := PODIUM]
+  cycler_pos[, PODIUM := NULL]
   cyc_type <- ADM_CYCLER_INFO[, .(SHORT_TYPE, CYCLER_ID, TEAM_ID)]
   joinaa <- cyc_type[cycler_pos, on = "CYCLER_ID"]
 
@@ -38,9 +44,12 @@ create_track_status_map_scrollable <- function(ADM_CYCLER_INFO, game_status, tra
   join_pa_map[, pa_color_with_finish := ifelse(GAME_SLOT_ID <= start_slot | GAME_SLOT_ID >= finish_slot, 10, pa_color)]
 
   first_extra_slot <- game_status[LANE_NO > 3, min(GAME_SLOT_ID)]
-  filter_lanes <- join_pa_map[GAME_SLOT_ID < first_extra_slot]
-  filter_lanes[, SLOT_Y_AXIS := GAME_SLOT_ID]
-  filter_lanes[, EXHAUSTED := ifelse(CYCLER_ID %in% exhausted_cyclers, 'z', NA)]
+  filter_lanes2 <- join_pa_map[GAME_SLOT_ID < first_extra_slot]
+  filter_lanes2[, SLOT_Y_AXIS := GAME_SLOT_ID]
+  filter_lanes2[, EXHAUSTED := ifelse(CYCLER_ID %in% exhausted_cyclers, 'z', NA)]
+
+  #join_prev_move
+  filter_lanes <- prev_moves[filter_lanes2, on = .(CYCLER_ID)]
 
   aggr_slot_coord_orig <- track_info[, .N, by = .(GAME_SLOT_ID, SLOT_COORD)][, N := NULL]
   max_id_from_orig <- aggr_slot_coord_orig[, max(GAME_SLOT_ID)] + 1
@@ -61,6 +70,7 @@ aggr_slot_coord <- rbind(aggr_slot_coord_orig, continue_coords)
     geom_tile(aes( color=as.factor(pa_color_with_finish), width = 1, height = 0.92), size = 1.2) +
     geom_text(aes(label = SHORT_TYPE, color = as.factor(font_color), size = text_size, fontface = fontti)) +
     geom_text(aes(hjust = -0.8, vjust = 0.7, label = EXHAUSTED, color = as.factor(font_color), size = text_size_exh, fontface = fontti)) +
+    geom_text(aes(hjust = 1.8, vjust = 0.7, label = CARD_ID, color = as.factor(font_color), size = text_size_exh, fontface = fontti)) +
     scale_size(range = c(10, 12), guide = F) +#legend hidden +
     scale_fill_manual(values=c("1" = "red",
                                "2" = "blue3",
